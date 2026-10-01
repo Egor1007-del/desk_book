@@ -38,3 +38,7 @@
 !/app/assets/builds/.keep
 
 /node_modules
+
+# Local OpenCode instructions and project notes
+/AGENTS.md
+/docs/
