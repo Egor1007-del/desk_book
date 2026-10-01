@@ -19,6 +19,8 @@ gem "cssbundling-rails"
 # Render application views with Slim; blueprint-html2slim converts the initial ERB templates once.
 gem "slim-rails"
 gem "blueprint-html2slim", "~> 1.3.1", group: :development
+# Build forms with Bootstrap-compatible wrappers and validation markup.
+gem "simple_form", "~> 5.4"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
