@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  devise :database_authenticatable, :validatable, authentication_keys: [ :login ]
+
   belongs_to :position, inverse_of: :users
 
   before_validation :normalize_login
@@ -8,6 +10,12 @@ class User < ApplicationRecord
 
   def full_name
     [ last_name, first_name, middle_name ].compact_blank.join(" ")
+  end
+
+  protected
+
+  def email_required?
+    false
   end
 
   private

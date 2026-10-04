@@ -40,7 +40,8 @@ class PositionTest < ActiveSupport::TestCase
       first_name: "John",
       hired_on: Date.new(2024, 1, 15),
       login: "john.doe",
-      encrypted_password: "password-digest"
+      password: "secret123",
+      password_confirmation: "secret123"
     )
 
     assert_not position.destroy

@@ -1,0 +1,9 @@
+- content_for :title, "Employee directory"
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
+      h1.h2.mb-1 Employee directory
+      p.text-secondary.mb-0 You are signed in as #{current_user.full_name}.
+    = button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn btn-outline-secondary"

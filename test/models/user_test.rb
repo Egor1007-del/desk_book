@@ -33,6 +33,30 @@ class UserTest < ActiveSupport::TestCase
     assert_predicate user, :persisted?
   end
 
+  test "validates a provided email format" do
+    user = User.new(valid_attributes.merge(email: "invalid-email"))
+
+    assert_not user.valid?
+    assert user.errors.of_kind?(:email, :invalid)
+  end
+
+  test "requires a password for a new user" do
+    user = User.new(valid_attributes.except(:password, :password_confirmation))
+
+    assert_not user.valid?
+    assert user.errors.of_kind?(:password, :blank)
+  end
+
+  test "stores a password as a hash" do
+    user = User.create!(
+      valid_attributes
+    )
+
+    assert_not_equal "secret123", user.encrypted_password
+    assert user.valid_password?("secret123")
+    assert_not user.valid_password?("wrong-password")
+  end
+
   test "normalizes login before validation" do
     user = User.create!(valid_attributes.merge(login: "  John.Doe  "))
 
@@ -83,7 +107,8 @@ class UserTest < ActiveSupport::TestCase
       position: @position,
       hired_on: Date.new(2024, 1, 15),
       login: "john.doe",
-      encrypted_password: "password-digest"
+      password: "secret123",
+      password_confirmation: "secret123"
     }
   end
 end

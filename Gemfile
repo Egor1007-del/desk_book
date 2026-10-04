@@ -2,6 +2,8 @@ source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "8.1.3.1"
+# Rails 8.1.3.1 passes JSON parser options as a positional hash.
+gem "json", "< 3"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
@@ -21,6 +23,8 @@ gem "slim-rails"
 gem "blueprint-html2slim", "~> 1.3.1", group: :development
 # Build forms with Bootstrap-compatible wrappers and validation markup.
 gem "simple_form", "~> 5.4"
+# Authenticate employees by login and password.
+gem "devise"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
