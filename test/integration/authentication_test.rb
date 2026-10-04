@@ -22,6 +22,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     get new_user_session_path
 
     assert_response :success
+    assert_select "title", text: "Sign in"
     assert_select "input[name='user[login]']"
     assert_select "input[name='user[password]']"
   end
@@ -50,6 +51,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_response :success
+    assert_select "title", text: "Employee directory"
     assert_select "h1", text: "Employee directory"
     assert_select "p", text: /Doe John/
   end

@@ -27,6 +27,8 @@ gem "simple_form", "~> 5.4"
 gem "devise"
 # Assign administrator and employee roles.
 gem "rolify"
+# Authorize server-side actions with explicit policies.
+gem "pundit"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
