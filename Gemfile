@@ -25,6 +25,8 @@ gem "blueprint-html2slim", "~> 1.3.1", group: :development
 gem "simple_form", "~> 5.4"
 # Authenticate employees by login and password.
 gem "devise"
+# Assign administrator and employee roles.
+gem "rolify"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 

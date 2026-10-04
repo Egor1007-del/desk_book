@@ -3,15 +3,18 @@ require "test_helper"
 class AuthenticationTest < ActionDispatch::IntegrationTest
   setup do
     position = Position.create!(name: "Developer")
-    @user = User.create!(
-      last_name: "Doe",
-      first_name: "John",
-      position: position,
-      hired_on: Date.new(2024, 1, 15),
-      email: "john.doe@example.com",
-      login: "john.doe",
-      password: "secret123",
-      password_confirmation: "secret123"
+    @user = User.create_with_role!(
+      {
+        last_name: "Doe",
+        first_name: "John",
+        position: position,
+        hired_on: Date.new(2024, 1, 15),
+        email: "john.doe@example.com",
+        login: "john.doe",
+        password: "secret123",
+        password_confirmation: "secret123"
+      },
+      role: :employee
     )
   end
 

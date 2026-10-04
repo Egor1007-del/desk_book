@@ -10,12 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_005823) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_133116) do
   create_table "positions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_positions_on_name", unique: true
+  end
+
+  create_table "roles", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "resource_id"
+    t.string "resource_type"
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_roles_on_name", unique: true
+    t.index ["resource_type", "resource_id"], name: "index_roles_on_resource"
   end
 
   create_table "users", force: :cascade do |t|
@@ -34,5 +44,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_005823) do
     t.index ["position_id"], name: "index_users_on_position_id"
   end
 
+  create_table "users_roles", id: false, force: :cascade do |t|
+    t.integer "role_id", null: false
+    t.integer "user_id", null: false
+    t.index ["role_id"], name: "index_users_roles_on_role_id"
+    t.index ["user_id"], name: "index_users_roles_on_user_id", unique: true
+  end
+
   add_foreign_key "users", "positions"
+  add_foreign_key "users_roles", "roles"
+  add_foreign_key "users_roles", "users"
 end
