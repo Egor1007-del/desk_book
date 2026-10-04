@@ -1,24 +1,30 @@
-# README
+# Desk Book
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Справочник сотрудников организации на Ruby on Rails.
 
-Things you may want to cover:
+## Начальные данные
 
-* Ruby version
+Примените миграции и загрузите начальные данные:
 
-* System dependencies
+```bash
+bin/rails db:migrate
+bin/rails db:seed
+```
 
-* Configuration
+Seeds создают три должности, роли `admin` и `employee`, а также первоначального администратора. Его логин и пароль можно передать через переменные окружения:
 
-* Database creation
+```bash
+ADMIN_LOGIN=admin ADMIN_PASSWORD=change-me bin/rails db:seed
+```
 
-* Database initialization
+Переменные также можно экспортировать для текущей оболочки:
 
-* How to run the test suite
+```bash
+export ADMIN_LOGIN=admin
+export ADMIN_PASSWORD=change-me
+bin/rails db:seed
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+Если переменные не заданы, используются учебные значения `admin`/`admin`. Не используйте стандартный пароль при реальном развёртывании. Повторный запуск seeds не перезаписывает пароль существующего администратора.
 
-* Deployment instructions
-
-* ...
+Проект не загружает `.env` автоматически. Не добавляйте `.env` с рабочими учётными данными и другими секретами в Git.
