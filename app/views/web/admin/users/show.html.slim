@@ -1,0 +1,34 @@
+- content_for :title, @user.full_name
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
+      h1.h2.mb-1 = @user.full_name
+      p.text-secondary.mb-0 = @user.position.name
+    .d-flex.gap-2
+      = link_to "Edit", edit_admin_user_path(@user), class: "btn btn-primary"
+      - if policy([:admin, @user]).destroy?
+        = button_to "Delete", admin_user_path(@user), method: :delete,
+          class: "btn btn-outline-danger",
+          data: { turbo_confirm: "Delete #{@user.full_name}?" }
+
+  .card.border-0.shadow-sm
+    .card-body
+      dl.row.mb-0
+        dt.col-sm-4 Position
+        dd.col-sm-8 = @user.position.name
+        dt.col-sm-4 Hired on
+        dd.col-sm-8 = l(@user.hired_on, format: :long)
+        dt.col-sm-4 Phone
+        dd.col-sm-8 = @user.phone.presence || "—"
+        dt.col-sm-4 Email
+        dd.col-sm-8 = @user.email.presence || "—"
+        dt.col-sm-4 Login
+        dd.col-sm-8 = @user.login
+        dt.col-sm-4 Role
+        dd.col-sm-8 = @user.role_name.capitalize
+
+  .mt-4
+    = link_to "Back to management", admin_users_path, class: "btn btn-outline-secondary"
+    = link_to "Public card", user_path(@user), class: "btn btn-outline-secondary ms-2"

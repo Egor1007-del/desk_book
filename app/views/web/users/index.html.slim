@@ -1,0 +1,46 @@
+- content_for :title, "Employee directory"
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
+      h1.h2.mb-1 Employee directory
+      p.text-secondary.mb-0 #{@users.size} employee#{"s" if @users.size != 1}
+    - if policy([:admin, User]).index?
+      = link_to "Manage employees", admin_users_path, class: "btn btn-primary"
+
+  .table-responsive
+    table.table.table-hover.table-striped.mb-0
+      thead.table-light
+        tr
+          th Full name
+          th Position
+          th Hired on
+          th Phone
+          th Email
+          - if policy(User).show_login?
+            th Login
+          - if policy(User).show_role?
+            th Role
+          th Actions
+      tbody
+        - @users.each do |user|
+          tr
+            td = link_to user.full_name, user
+            td = user.position&.name
+            td = l(user.hired_on, format: :short)
+            td = user.phone.presence || "—"
+            td = user.email.presence || "—"
+            - if policy(user).show_login?
+              td = user.login
+            - if policy(user).show_role?
+              td = user.roles.first&.name&.capitalize
+            td
+              - if policy(user).show?
+                = link_to "View", user, class: "btn btn-sm btn-outline-primary"
+              - if policy([:admin, user]).update?
+                = link_to "Edit", [:edit, :admin, user], class: "btn btn-sm btn-outline-secondary ms-1"
+              - if policy([:admin, user]).destroy?
+                = button_to "Delete", [:admin, user], method: :delete,
+                  class: "btn btn-sm btn-outline-danger ms-1",
+                  data: { turbo_confirm: "Delete #{user.full_name}?" }

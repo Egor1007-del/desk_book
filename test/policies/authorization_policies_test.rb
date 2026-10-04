@@ -6,18 +6,16 @@ class PolicyTestCase < ActiveSupport::TestCase
   def create_user(login:, role:)
     position = Position.find_or_create_by!(name: "Developer")
 
-    User.create_with_role!(
-      {
-        last_name: login.capitalize,
-        first_name: "User",
-        position: position,
-        hired_on: Date.new(2024, 1, 15),
-        login: login,
-        password: "secret123",
-        password_confirmation: "secret123"
-      },
-      role: role
+    user = User.new(
+      last_name: login.capitalize,
+      first_name: "User",
+      position: position,
+      hired_on: Date.new(2024, 1, 15),
+      login: login,
+      password: "secret123",
+      password_confirmation: "secret123"
     )
+    user.save_with_role!(role: role)
   end
 end
 

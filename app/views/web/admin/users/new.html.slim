@@ -1,0 +1,8 @@
+- content_for :title, "New employee"
+
+.container.py-5
+  .mb-4
+    p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
+    h1.h2.mb-1 New employee
+
+  = render "form", user: @user

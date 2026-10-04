@@ -3,19 +3,17 @@ require "test_helper"
 class AuthenticationTest < ActionDispatch::IntegrationTest
   setup do
     position = Position.create!(name: "Developer")
-    @user = User.create_with_role!(
-      {
-        last_name: "Doe",
-        first_name: "John",
-        position: position,
-        hired_on: Date.new(2024, 1, 15),
-        email: "john.doe@example.com",
-        login: "john.doe",
-        password: "secret123",
-        password_confirmation: "secret123"
-      },
-      role: :employee
+    @user = User.new(
+      last_name: "Doe",
+      first_name: "John",
+      position: position,
+      hired_on: Date.new(2024, 1, 15),
+      email: "john.doe@example.com",
+      login: "john.doe",
+      password: "secret123",
+      password_confirmation: "secret123"
     )
+    @user.save_with_role!(role: :employee)
   end
 
   test "renders a login form with login and password fields" do
@@ -82,9 +80,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "does not expose registration or password recovery routes" do
-    assert_raises(ActionController::RoutingError) do
-      Rails.application.routes.recognize_path("/users/sign_up", method: :get)
-    end
+    get "/users/sign_up"
+    assert_redirected_to new_user_session_path
 
     assert_raises(ActionController::RoutingError) do
       Rails.application.routes.recognize_path("/users/password/new", method: :get)

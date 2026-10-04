@@ -14,19 +14,17 @@ ApplicationRecord.transaction do
 
   unless admin
     password = ENV.fetch("ADMIN_PASSWORD", "admin")
-    admin = User.create_with_role!(
-      {
-        last_name: "Администратор",
-        first_name: "Системы",
-        position: positions.fetch("должность 1"),
-        hired_on: Date.current,
-        login: admin_login,
-        password: password,
-        password_confirmation: password
-      },
-      role: :admin
+    admin = User.new(
+      last_name: "Администратор",
+      first_name: "Системы",
+      position: positions.fetch("должность 1"),
+      hired_on: Date.current,
+      login: admin_login,
+      password: password,
+      password_confirmation: password
     )
+    admin.save_with_role!(role: :admin)
   end
 
-  admin.assign_role!(:admin) unless admin.only_has_role?(:admin)
+  admin.save_with_role!(role: :admin) unless admin.only_has_role?(:admin)
 end

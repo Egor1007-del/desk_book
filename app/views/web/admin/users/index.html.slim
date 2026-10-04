@@ -1,0 +1,35 @@
+- content_for :title, "Manage employees"
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
+      h1.h2.mb-1 Manage employees
+      p.text-secondary.mb-0 #{@users.size} employee#{"s" if @users.size != 1}
+    = link_to "New employee", new_admin_user_path, class: "btn btn-primary"
+
+  .table-responsive
+    table.table.table-hover.table-striped.align-middle.mb-0
+      thead.table-light
+        tr
+          th Full name
+          th Position
+          th Login
+          th Role
+          th Actions
+      tbody
+        - @users.each do |user|
+          tr
+            td = link_to user.full_name, admin_user_path(user)
+            td = user.position.name
+            td = user.login
+            td = user.role_name.capitalize
+            td
+              = link_to "Edit", edit_admin_user_path(user), class: "btn btn-sm btn-outline-primary"
+              - if policy([:admin, user]).destroy?
+                = button_to "Delete", admin_user_path(user), method: :delete,
+                  class: "btn btn-sm btn-outline-danger ms-1",
+                  data: { turbo_confirm: "Delete #{user.full_name}?" }
+
+  .mt-4
+    = link_to "Public directory", users_path, class: "btn btn-outline-secondary"

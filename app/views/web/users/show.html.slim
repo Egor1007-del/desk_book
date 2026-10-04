@@ -1,0 +1,47 @@
+- content_for :title, @user.full_name
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
+      h1.h2.mb-1 = @user.full_name
+      p.text-secondary.mb-0 #{@user.position&.name} · Hired #{l(@user.hired_on, format: :long)}
+
+  .row.g-4
+    .col-12.col-md-6
+      .card.border-0.shadow-sm
+        .card-header.bg-white.border-0
+          h5.fw-semibold.mb-0 Contact
+        .card-body
+          dl.row.mb-0
+            dt.col-sm-3 Phone
+            dd.col-sm-9 = @user.phone.presence || "—"
+            dt.col-sm-3 Email
+            dd.col-sm-9 = @user.email.presence || "—"
+
+    .col-12.col-md-6
+      .card.border-0.shadow-sm
+        .card-header.bg-white.border-0
+          h5.fw-semibold.mb-0 Employment
+        .card-body
+          dl.row.mb-0
+            dt.col-sm-3 Position
+            dd.col-sm-9 = @user.position&.name
+            dt.col-sm-3 Hired on
+            dd.col-sm-9 = l(@user.hired_on, format: :long)
+            - if policy(@user).show_login?
+              dt.col-sm-3 Login
+              dd.col-sm-9 = @user.login
+            - if policy(@user).show_role?
+              dt.col-sm-3 Role
+              dd.col-sm-9 = @user.roles.first&.name&.capitalize
+
+  .mt-4
+    - if policy(@user).show?
+      = link_to "Back to directory", users_path, class: "btn btn-outline-secondary"
+    - if policy([:admin, @user]).update?
+      = link_to "Edit", [:edit, :admin, @user], class: "btn btn-outline-primary ms-2"
+    - if policy([:admin, @user]).destroy?
+      = button_to "Delete", [:admin, @user], method: :delete,
+        class: "btn btn-outline-danger ms-2",
+        data: { turbo_confirm: "Delete #{@user.full_name}?" }
