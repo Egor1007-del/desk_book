@@ -15,6 +15,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Manage employees"
     assert_select "a[href='#{new_admin_user_path}']", text: "New employee"
+    assert_select "td.text-nowrap .d-flex.flex-nowrap.gap-1", count: 2
 
     get admin_user_path(@employee)
     assert_response :success

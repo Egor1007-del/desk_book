@@ -64,6 +64,7 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     assert_select "td", text: @admin.login
     assert_select "td", text: "Employee"
     assert_select "td", text: "Admin"
+    assert_select "td.text-nowrap .d-flex.flex-nowrap.gap-1", count: 2
   end
 
   test "employee sees own card without login and role" do

@@ -26,7 +26,7 @@
             th Login
           - if policy(User).show_role?
             th Role
-          th Actions
+          th.text-nowrap Actions
       tbody
         - @users.each do |user|
           tr
@@ -39,12 +39,13 @@
               td = user.login
             - if policy(user).show_role?
               td = user.roles.first&.name&.capitalize
-            td
-              - if policy(user).show?
-                = link_to "View", user, class: "btn btn-sm btn-outline-primary"
-              - if policy([:admin, user]).update?
-                = link_to "Edit", [:edit, :admin, user], class: "btn btn-sm btn-outline-secondary ms-1"
-              - if policy([:admin, user]).destroy?
-                = button_to "Delete", [:admin, user], method: :delete,
-                  class: "btn btn-sm btn-outline-danger ms-1",
-                  data: { turbo_confirm: "Delete #{user.full_name}?" }
+            td.text-nowrap
+              .d-flex.flex-nowrap.gap-1
+                - if policy(user).show?
+                  = link_to "View", user, class: "btn btn-sm btn-outline-primary"
+                - if policy([:admin, user]).update?
+                  = link_to "Edit", [:edit, :admin, user], class: "btn btn-sm btn-outline-secondary"
+                - if policy([:admin, user]).destroy?
+                  = button_to "Delete", [:admin, user], method: :delete,
+                    class: "btn btn-sm btn-outline-danger",
+                    data: { turbo_confirm: "Delete #{user.full_name}?" }
