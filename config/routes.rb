@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   scope module: :web do
     root "home#index"
     resources :users, only: %i[index show]
+    resource :profile, only: %i[edit update]
 
     namespace :admin do
       resources :users

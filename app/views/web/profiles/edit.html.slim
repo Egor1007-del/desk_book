@@ -1,0 +1,30 @@
+- content_for :title, "Edit profile"
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
+      h1.h2.mb-1 Edit profile
+      p.text-secondary.mb-0 = @user.full_name
+    = link_to "Back to directory", users_path, class: "btn btn-outline-secondary"
+
+  .card.border-0.shadow-sm
+    .card-body
+      = simple_form_for @user, url: profile_path, method: :patch do |form|
+        = form.error_notification
+
+        .row.g-3
+          .col-12.col-md-6
+            = form.input :phone
+          .col-12.col-md-6
+            = form.input :email
+          .col-12.col-md-6
+            = form.input :login, required: true
+          .col-12.col-md-6
+            = form.input :password, required: false,
+              hint: "Leave blank to keep current password"
+          .col-12.col-md-6
+            = form.input :password_confirmation, required: false
+
+        .mt-4
+          = form.button :submit, "Save profile", class: "btn btn-primary"
