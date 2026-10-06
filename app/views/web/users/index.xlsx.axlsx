@@ -1,0 +1,13 @@
+workbook = xlsx_package.workbook
+header_style = workbook.styles.add_style(b: true)
+body_style = workbook.styles.add_style(alignment: { horizontal: :left })
+column_types = Array.new(4, :string)
+
+workbook.add_worksheet(name: "Employees") do |sheet|
+  sheet.add_row [ "Full name", "Position", "Phone", "Email" ], style: header_style
+
+  @users.each do |user|
+    sheet.add_row [ user.full_name, user.position.name, user.phone, user.email ],
+      style: body_style, types: column_types
+  end
+end

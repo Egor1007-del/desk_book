@@ -29,6 +29,9 @@ gem "devise"
 gem "rolify"
 # Authorize server-side actions with explicit policies.
 gem "pundit"
+# Export the employee directory as an Office Open XML workbook.
+gem "caxlsx"
+gem "caxlsx_rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 

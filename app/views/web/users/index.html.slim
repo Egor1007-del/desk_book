@@ -7,6 +7,8 @@
       h1.h2.mb-1 Employee directory
       p.text-secondary.mb-0 #{@users.size} employee#{"s" if @users.size != 1}
     .d-flex.gap-2
+      = link_to "Download Excel", users_path(format: :xlsx),
+        class: "btn btn-success", data: { turbo: false }
       = link_to "Edit profile", edit_profile_path, class: "btn btn-outline-primary"
       - if policy([:admin, User]).index?
         = link_to "Manage employees", admin_users_path, class: "btn btn-primary"
