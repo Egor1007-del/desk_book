@@ -1,2 +1,56 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+
+.brand-mark {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.65rem;
+  color: $white;
+  background: $gray-900;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba($gray-900, 0.08);
+  background:
+    radial-gradient(circle at 92% 12%, rgba($warning, 0.3), transparent 30%),
+    linear-gradient(135deg, $white 0%, $gray-100 100%);
+}
+
+.home-hero::after {
+  position: absolute;
+  right: -4rem;
+  bottom: -5rem;
+  width: 13rem;
+  height: 13rem;
+  border: 2rem solid rgba($gray-900, 0.04);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.home-kicker {
+  color: $gray-600;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.home-summary {
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba($white, 0.18);
+  color: $white;
+  background: $gray-900;
+  box-shadow: 0 1.5rem 3rem rgba($gray-900, 0.18);
+}
+
+.home-summary .text-secondary {
+  color: rgba($white, 0.68) !important;
+}

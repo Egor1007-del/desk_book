@@ -15,11 +15,25 @@ html
     link[rel="apple-touch-icon" href="/icon.png"]
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = javascript_importmap_tags
-  body
+  body.bg-body-tertiary
+    nav.navbar.bg-white.border-bottom.sticky-top[aria-label="Main navigation"]
+      .container
+        = link_to root_path, class: "navbar-brand d-flex align-items-center gap-2 fw-semibold" do
+          span.brand-mark DB
+          span Desk Book
+        .d-flex.align-items-center.gap-2
+          = link_to "Home", root_path, class: "btn btn-sm btn-outline-secondary"
+          - if user_signed_in?
+            span.d-none.d-md-inline.text-secondary.small = current_user.full_name
+            = button_to "Sign out", destroy_user_session_path, method: :delete,
+              class: "btn btn-sm btn-dark"
+          - else
+            = link_to "Sign in", new_user_session_path, class: "btn btn-sm btn-dark"
     - flash.each do |type, message|
       - alert_class = type.to_s == "notice" ? "success" : "danger"
       .container.pt-3
         .alert.alert-dismissible.fade.show[class="alert-#{alert_class}" role="alert"]
           = message
           button.btn-close[type="button" data-bs-dismiss="alert" aria-label="Close"]
-    = yield
+    main
+      = yield

@@ -122,7 +122,7 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
   test "employee home links to the public directory" do
     sign_in_as(@employee)
 
-    assert_select "a[href='#{users_path}']", text: "Directory"
+    assert_select "a[href='#{users_path}']", text: "Open directory"
     assert_select "a[href='#{admin_users_path}']", count: 0
   end
 

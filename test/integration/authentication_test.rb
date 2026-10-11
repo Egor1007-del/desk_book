@@ -25,6 +25,16 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "input[name='user[password]']"
   end
 
+  test "guest layout has home and sign in links" do
+    get new_user_session_path
+
+    assert_select "nav[aria-label='Main navigation']" do
+      assert_select "a[href='#{root_path}']", text: "Home"
+      assert_select "a[href='#{new_user_session_path}']", text: "Sign in"
+      assert_select "form[action='#{destroy_user_session_path}']", count: 0
+    end
+  end
+
   test "redirects an unauthenticated user to the login page" do
     get root_path
 
@@ -49,9 +59,34 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_response :success
-    assert_select "title", text: "Employee directory"
-    assert_select "h1", text: "Employee directory"
+    assert_select "title", text: "Desk Book"
+    assert_select "h1", text: "A directory that remembers the people behind the work."
     assert_select "p", text: /Doe John/
+  end
+
+  test "signed in layout has home and sign out controls" do
+    post user_session_path, params: {
+      user: { login: @user.login, password: "secret123" }
+    }
+    follow_redirect!
+
+    assert_select "nav[aria-label='Main navigation']" do
+      assert_select "a[href='#{root_path}']", text: "Home"
+      assert_select "form[action='#{destroy_user_session_path}'] button", text: "Sign out"
+      assert_select "a[href='#{new_user_session_path}']", count: 0
+    end
+  end
+
+  test "home page explains the directory and has interactive guidance" do
+    post user_session_path, params: {
+      user: { login: @user.login, password: "secret123" }
+    }
+    follow_redirect!
+
+    assert_select ".home-summary", text: /1 employee/
+    assert_select "a[href='https://github.com/Egor1007-del/desk_book'][target='_blank']", text: "View on GitHub"
+    assert_select "#directory-guide button[data-bs-toggle='collapse']", count: 3
+    assert_select "#directory-purpose.collapse.show", text: /searchable register/
   end
 
   test "does not sign in with an incorrect password" do
