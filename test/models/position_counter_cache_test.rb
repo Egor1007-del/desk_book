@@ -23,7 +23,7 @@ class PositionCounterCacheTest < ActiveSupport::TestCase
     assert_equal 0, @position.reload.users_count
     assert_equal 1, @destination.reload.users_count
 
-    user.update!(phone: "12345")
+    user.update!(phone: "9181234567")
 
     assert_equal 0, @position.reload.users_count
     assert_equal 1, @destination.reload.users_count

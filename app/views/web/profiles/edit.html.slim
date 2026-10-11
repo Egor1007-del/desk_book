@@ -1,12 +1,12 @@
-- content_for :title, "Edit profile"
+- content_for :title, t("profiles.edit.title")
 
 .container.py-5
   .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
     div
-      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
-      h1.h2.mb-1 Edit profile
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.name")
+      h1.h2.mb-1 = t("profiles.edit.title")
       p.text-secondary.mb-0 = @user.full_name
-    = link_to "Back to directory", users_path, class: "btn btn-outline-secondary"
+    = link_to t("actions.back_to_directory"), users_path, class: "btn btn-outline-secondary"
 
   .card.border-0.shadow-sm
     .card-body
@@ -22,9 +22,9 @@
             = form.input :login, required: true
           .col-12.col-md-6
             = form.input :password, required: false,
-              hint: "Leave blank to keep current password"
+              hint: t("forms.password_hint")
           .col-12.col-md-6
             = form.input :password_confirmation, required: false
 
         .mt-4
-          = form.button :submit, "Save profile", class: "btn btn-primary"
+          = form.button :submit, t("profiles.edit.save"), class: "btn btn-primary"

@@ -28,4 +28,138 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  brand:
+    name: "Desk Book"
+    admin: "Desk Book Admin"
+  navigation:
+    main: "Main navigation"
+    language: "Language"
+    home: "Home"
+    sign_in: "Sign in"
+    sign_out: "Sign out"
+  actions:
+    title: "Actions"
+    view: "View"
+    edit: "Edit"
+    delete: "Delete"
+    save: "Save"
+    cancel: "Cancel"
+    close: "Close"
+    download_excel: "Download Excel"
+    back_to_directory: "Back to directory"
+    back_to_management: "Back to management"
+  attributes:
+    full_name: "Full name"
+  employees:
+    count:
+      one: "%{count} employee"
+      other: "%{count} employees"
+  roles:
+    admin: "Admin"
+    employee: "Employee"
+  authorization:
+    denied: "You are not authorized to perform this action."
+  sessions:
+    new:
+      title: "Sign in"
+      description: "Enter your employee login and password."
+  home:
+    kicker: "People, roles, continuity"
+    title: "A directory that remembers the people behind the work."
+    description: "Desk Book keeps employee contacts, positions and responsibilities in one clear place, so the right colleague is never more than a few clicks away."
+    github: "View on GitHub"
+    summary:
+      title: "Current desk note"
+      description: "Reliable directories are quiet infrastructure: they save a little time every day, then save a great deal when someone urgently needs the right person."
+    parable:
+      title: "The desk-book parable"
+      body: "A team once labelled every key but forgot to write down which door it opened. The labels were perfect; the work still stopped."
+      conclusion: "A useful directory connects information to a real person and a real responsibility."
+    guide:
+      purpose:
+        question: "What does Desk Book solve?"
+        answer: "It turns scattered contact details into one searchable register with a clear position, phone number and email for every employee."
+      access:
+        question: "How is access kept clear?"
+        answer: "Employees can browse the directory and maintain their own account. Administrators manage employee records, roles and organization analytics."
+      habit:
+        question: "What makes a directory useful?"
+        answer: "Small updates. A current phone number today prevents a long search tomorrow."
+  users:
+    index:
+      title: "Employee directory"
+      open: "Open directory"
+    show:
+      hired: "%{position} · Hired %{date}"
+      contact: "Contact"
+      employment: "Employment"
+    confirm_delete: "Delete %{name}?"
+  profiles:
+    edit:
+      title: "Edit profile"
+      save: "Save profile"
+  admin:
+    users:
+      index:
+        title: "Manage employees"
+      new:
+        title: "New employee"
+      edit:
+        title: "Edit %{name}"
+    analytics:
+      title: "Employee analytics"
+      description: "Latest hires by position"
+      no_positions: "No positions yet."
+      total:
+        one: "Total employees: %{count}"
+        other: "Total employees: %{count}"
+      no_employees: "No employees in this position."
+  forms:
+    select_position: "Select position"
+    password_hint: "Leave blank to keep current password"
+  flash:
+    users:
+      created: "User created"
+      updated: "User updated"
+      deleted: "User deleted"
+    profile:
+      updated: "Profile updated"
+  xlsx:
+    users:
+      sheet_name: "Employees"
+      headers:
+        - "Full name"
+        - "Position"
+        - "Phone"
+        - "Email"
+  activerecord:
+    models:
+      user: "Employee"
+      position: "Position"
+      role: "Role"
+    attributes:
+      user:
+        last_name: "Last name"
+        first_name: "First name"
+        middle_name: "Middle name"
+        position: "Position"
+        position_id: "Position"
+        hired_on: "Hired on"
+        phone: "Phone"
+        email: "Email"
+        login: "Login"
+        password: "Password"
+        password_confirmation: "Password confirmation"
+        role_name: "Role"
+      position:
+        name: "Name"
+      role:
+        name: "Name"
+    errors:
+      models:
+        user:
+          attributes:
+            phone:
+              invalid_russian_mobile: "must be a Russian mobile number"
+            role_name:
+              last_administrator: "cannot remove the last administrator"

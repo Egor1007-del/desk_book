@@ -42,12 +42,23 @@ class UsersExportTest < ActionDispatch::IntegrationTest
 
     assert_xlsx_response
     assert_equal [
-      [ "Full name", "Position", "Phone", "Email" ],
+      I18n.t("xlsx.users.headers"),
       [ @employee.full_name, @employee.position.name, @employee.phone, @employee.email ],
       [ @admin.full_name, @admin.position.name, nil, nil ]
     ], worksheet_rows
+    assert_equal I18n.t("xlsx.users.sheet_name"), worksheet_name
     assert_phone_is_left_aligned
     assert_private_fields_absent
+  end
+
+  test "export uses the selected English locale" do
+    sign_in_as(@employee)
+
+    get users_path(format: :xlsx, locale: :en)
+
+    assert_xlsx_response
+    assert_equal I18n.t("xlsx.users.headers", locale: :en), worksheet_rows.first
+    assert_equal I18n.t("xlsx.users.sheet_name", locale: :en), worksheet_name
   end
 
   test "admin can export the same public registry fields" do
@@ -67,7 +78,7 @@ class UsersExportTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "a[href='#{users_path(format: :xlsx)}'][data-turbo='false']",
-      text: "Download Excel"
+      text: I18n.t("actions.download_excel")
   end
 
   private
@@ -121,6 +132,14 @@ class UsersExportTest < ActionDispatch::IntegrationTest
       return document.xpath("//sheetData/row").map do |row|
         row.xpath("./c").map { |cell| cell.xpath(".//t").map(&:text).join.presence }
       end
+    end
+  end
+
+  def worksheet_name
+    Zip::File.open_buffer(StringIO.new(response.body)) do |archive|
+      workbook = Nokogiri::XML(archive.read("xl/workbook.xml"))
+      workbook.remove_namespaces!
+      return workbook.at_xpath("//sheets/sheet")["name"]
     end
   end
 

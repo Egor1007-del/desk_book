@@ -1,31 +1,31 @@
-- content_for :title, "Manage employees"
+- content_for :title, t("admin.users.index.title")
 
 .container.py-5
   .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
     div
-      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
-      h1.h2.mb-1 Manage employees
-      p.text-secondary.mb-0 = pluralize(@employees_count, "employee")
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.admin")
+      h1.h2.mb-1 = t("admin.users.index.title")
+      p.text-secondary.mb-0 = t("employees.count", count: @employees_count)
     .d-flex.flex-wrap.gap-2
-      = link_to "Download Excel", users_path(format: :xlsx),
+      = link_to t("actions.download_excel"), users_path(format: :xlsx),
         class: "btn btn-success", data: { turbo: false }
-      = link_to "Edit profile", edit_profile_path, class: "btn btn-outline-primary"
+      = link_to t("profiles.edit.title"), edit_profile_path, class: "btn btn-outline-primary"
       - if policy([:admin, :analytics]).show?
-        = link_to "Analytics", admin_analytics_path, class: "btn btn-outline-primary"
-      = link_to "New employee", new_admin_user_path, class: "btn btn-primary"
+        = link_to t("admin.analytics.title"), admin_analytics_path, class: "btn btn-outline-primary"
+      = link_to t("admin.users.new.title"), new_admin_user_path, class: "btn btn-primary"
 
   .table-responsive
     table.table.table-hover.table-striped.align-middle.mb-0
       thead.table-light
         tr
-          th Full name
-          th Position
-          th Hired on
-          th Phone
-          th Email
-          th Login
-          th Role
-          th.text-nowrap Actions
+          th = t("attributes.full_name")
+          th = User.human_attribute_name(:position)
+          th = User.human_attribute_name(:hired_on)
+          th = User.human_attribute_name(:phone)
+          th = User.human_attribute_name(:email)
+          th = User.human_attribute_name(:login)
+          th = User.human_attribute_name(:role_name)
+          th.text-nowrap = t("actions.title")
       tbody
         - @users.each do |user|
           tr
@@ -35,11 +35,11 @@
             td = user.phone.presence || "—"
             td = user.email.presence || "—"
             td = user.login
-            td = user.role_name.capitalize
+            td = t("roles.#{user.role_name}")
             td.text-nowrap
               .d-flex.flex-nowrap.gap-1
-                = link_to "Edit", edit_admin_user_path(user), class: "btn btn-sm btn-outline-primary"
+                = link_to t("actions.edit"), edit_admin_user_path(user), class: "btn btn-sm btn-outline-primary"
                 - if policy([:admin, user]).destroy?
-                  = button_to "Delete", admin_user_path(user), method: :delete,
+                  = button_to t("actions.delete"), admin_user_path(user), method: :delete,
                     class: "btn btn-sm btn-outline-danger",
-                    data: { turbo_confirm: "Delete #{user.full_name}?" }
+                    data: { turbo_confirm: t("users.confirm_delete", name: user.full_name) }

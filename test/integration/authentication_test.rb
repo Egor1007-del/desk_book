@@ -20,7 +20,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     get new_user_session_path
 
     assert_response :success
-    assert_select "title", text: "Sign in"
+    assert_select "html[lang='ru']"
+    assert_select "title", text: I18n.t("sessions.new.title")
     assert_select "input[name='user[login]']"
     assert_select "input[name='user[password]']"
   end
@@ -28,11 +29,41 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   test "guest layout has home and sign in links" do
     get new_user_session_path
 
-    assert_select "nav[aria-label='Main navigation']" do
-      assert_select "a[href='#{root_path}']", text: "Home"
-      assert_select "a[href='#{new_user_session_path}']", text: "Sign in"
+    assert_select "nav[aria-label='#{I18n.t('navigation.main')}']" do
+      assert_select "a[href='#{root_path}']", text: I18n.t("navigation.home")
+      assert_select "a[href='#{new_user_session_path}']", text: I18n.t("navigation.sign_in")
       assert_select "form[action='#{destroy_user_session_path}']", count: 0
     end
+  end
+
+  test "switches to English and remembers it in the session" do
+    get new_user_session_path(locale: :en)
+
+    assert_select "html[lang='en']"
+    assert_select "h1", text: I18n.t("sessions.new.title", locale: :en)
+
+    get new_user_session_path
+
+    assert_select "html[lang='en']"
+    assert_select "h1", text: I18n.t("sessions.new.title", locale: :en)
+  end
+
+  test "ignores an unsupported locale" do
+    get new_user_session_path(locale: :de)
+
+    assert_select "html[lang='ru']"
+    assert_select "h1", text: I18n.t("sessions.new.title", locale: :ru)
+  end
+
+  test "does not leak locale between browser sessions" do
+    english_session = open_session
+    russian_session = open_session
+
+    english_session.get new_user_session_path(locale: :en)
+    russian_session.get new_user_session_path
+
+    english_session.assert_select "html[lang='en']"
+    russian_session.assert_select "html[lang='ru']"
   end
 
   test "redirects an unauthenticated user to the login page" do
@@ -60,7 +91,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "title", text: "Desk Book"
-    assert_select "h1", text: "A directory that remembers the people behind the work."
+    assert_select "h1", text: I18n.t("home.title")
     assert_select "p", text: /Doe John/
   end
 
@@ -70,9 +101,9 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     }
     follow_redirect!
 
-    assert_select "nav[aria-label='Main navigation']" do
-      assert_select "a[href='#{root_path}']", text: "Home"
-      assert_select "form[action='#{destroy_user_session_path}'] button", text: "Sign out"
+    assert_select "nav[aria-label='#{I18n.t('navigation.main')}']" do
+      assert_select "a[href='#{root_path}']", text: I18n.t("navigation.home")
+      assert_select "form[action='#{destroy_user_session_path}'] button", text: I18n.t("navigation.sign_out")
       assert_select "a[href='#{new_user_session_path}']", count: 0
     end
   end
@@ -83,10 +114,10 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     }
     follow_redirect!
 
-    assert_select ".home-summary", text: /1 employee/
-    assert_select "a[href='https://github.com/Egor1007-del/desk_book'][target='_blank']", text: "View on GitHub"
+    assert_select ".home-summary", text: /#{I18n.t('employees.count', count: 1)}/
+    assert_select "a[href='https://github.com/Egor1007-del/desk_book'][target='_blank']", text: I18n.t("home.github")
     assert_select "#directory-guide button[data-bs-toggle='collapse']", count: 3
-    assert_select "#directory-purpose.collapse.show", text: /searchable register/
+    assert_select "#directory-purpose.collapse.show", text: I18n.t("home.guide.purpose.answer")
   end
 
   test "does not sign in with an incorrect password" do
@@ -95,7 +126,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :unprocessable_content
-    assert_select ".alert-danger", text: /Invalid login or password/
+    assert_select ".alert-danger", text: I18n.t("devise.failure.invalid")
 
     get root_path
 

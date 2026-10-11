@@ -22,7 +22,7 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to root_path
     follow_redirect!
-    assert_select ".alert-danger", text: "You are not authorized to perform this action."
+    assert_select ".alert-danger", text: I18n.t("authorization.denied")
   end
 
   test "administrator sees all positions in alphabetical order" do
@@ -31,8 +31,8 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     get admin_analytics_path
 
     assert_response :success
-    assert_select "title", text: "Employee analytics"
-    assert_select "h1", text: "Employee analytics"
+    assert_select "title", text: I18n.t("admin.analytics.title")
+    assert_select "h1", text: I18n.t("admin.analytics.title")
     assert_select "section h2" do |headings|
       assert_equal Position.order(:name).pluck(:name), headings.map(&:text)
     end
@@ -43,8 +43,8 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     get admin_analytics_path
 
     assert_select "#position_#{@empty_position.id}" do
-      assert_select ".badge", text: "Total employees: 0"
-      assert_select "p", text: "No employees in this position."
+      assert_select ".badge", text: I18n.t("admin.analytics.total", count: 0)
+      assert_select "p", text: I18n.t("admin.analytics.no_employees")
       assert_select "tbody tr", count: 0
     end
   end
@@ -54,14 +54,14 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     get admin_analytics_path
 
     assert_select "#position_#{@developer_position.id}" do
-      assert_select ".badge", text: "Total employees: 1"
+      assert_select ".badge", text: I18n.t("admin.analytics.total", count: 1)
       assert_select "tbody tr", count: 1
       assert_select "a[href='#{admin_user_path(@employee)}']", text: @employee.full_name
       assert_select "td", text: I18n.l(@employee.hired_on, format: :short)
       assert_select "a[href='#{admin_user_path(@admin)}']", count: 0
     end
     assert_select "#position_#{@manager_position.id}" do
-      assert_select ".badge", text: "Total employees: 1"
+      assert_select ".badge", text: I18n.t("admin.analytics.total", count: 1)
       assert_select "a[href='#{admin_user_path(@admin)}']", text: @admin.full_name
       assert_select "a[href='#{admin_user_path(@employee)}']", count: 0
     end
@@ -78,7 +78,7 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     get admin_analytics_path
 
     assert_select "#position_#{@developer_position.id}" do
-      assert_select ".badge", text: "Total employees: 6"
+      assert_select ".badge", text: I18n.t("admin.analytics.total", count: 6)
       assert_select "tbody tr", count: 5
       assert_select "a[href='#{admin_user_path(@employee)}']", count: 0
     end
@@ -120,14 +120,14 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
 
     get admin_users_path
 
-    assert_select "a[href='#{admin_analytics_path}']", text: "Analytics"
+    assert_select "a[href='#{admin_analytics_path}']", text: I18n.t("admin.analytics.title")
   end
 
   test "analytics links back to management" do
     sign_in_as(@admin)
     get admin_analytics_path
 
-    assert_select "a[href='#{admin_users_path}']", text: "Manage employees"
+    assert_select "a[href='#{admin_users_path}']", text: I18n.t("admin.users.index.title")
   end
 
   private

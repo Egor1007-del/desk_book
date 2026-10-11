@@ -1,33 +1,33 @@
-- content_for :title, "Employee analytics"
+- content_for :title, t("admin.analytics.title")
 
 .container.py-5
   .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
     div
-      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
-      h1.h2.mb-1 Employee analytics
-      p.text-secondary.mb-0 Latest hires by position
-    = link_to "Manage employees", admin_users_path, class: "btn btn-outline-primary"
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.admin")
+      h1.h2.mb-1 = t("admin.analytics.title")
+      p.text-secondary.mb-0 = t("admin.analytics.description")
+    = link_to t("admin.users.index.title"), admin_users_path, class: "btn btn-outline-primary"
 
   - if @positions.empty?
-    p.text-secondary No positions yet.
+    p.text-secondary = t("admin.analytics.no_positions")
 
   - @positions.each do |position|
     section.card.mb-4 id=dom_id(position)
       .card-header.d-flex.align-items-center.justify-content-between.gap-3
         h2.h5.mb-0 = position.name
         span.badge.text-bg-secondary
-          | Total employees: #{position.users_count}
+          = t("admin.analytics.total", count: position.users_count)
       .card-body
         - employees = @recent_employees.fetch(position)
         - if employees.empty?
-          p.text-secondary.mb-0 No employees in this position.
+          p.text-secondary.mb-0 = t("admin.analytics.no_employees")
         - else
           .table-responsive
             table.table.table-striped.align-middle.mb-0
               thead
                 tr
-                  th Full name
-                  th Hired on
+                  th = t("attributes.full_name")
+                  th = User.human_attribute_name(:hired_on)
               tbody
                 - employees.each do |employee|
                   tr

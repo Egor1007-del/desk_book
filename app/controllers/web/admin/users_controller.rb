@@ -24,7 +24,7 @@ module Web
         @user.assign_attributes(user_params)
 
         @user.save_with_role!(role: submitted_role)
-        redirect_to admin_user_path(@user), notice: "User created"
+        redirect_to admin_user_path(@user), notice: t("flash.users.created")
       rescue ActiveRecord::RecordInvalid
         render :new, status: :unprocessable_entity
       end
@@ -38,7 +38,7 @@ module Web
         authorize [ :admin, @user ], :change_role? if submitted_role != @user.role_name
 
         @user.save_with_role!(user_params, role: submitted_role)
-        redirect_to admin_user_path(@user), notice: "User updated"
+        redirect_to admin_user_path(@user), notice: t("flash.users.updated")
       rescue ActiveRecord::RecordInvalid
         render :edit, status: :unprocessable_entity
       end
@@ -46,7 +46,7 @@ module Web
       def destroy
         authorize [ :admin, @user ]
         @user.destroy_with_role_safety!
-        redirect_to admin_users_path, notice: "User deleted"
+        redirect_to admin_users_path, notice: t("flash.users.deleted")
       rescue ActiveRecord::RecordInvalid => error
         redirect_to admin_user_path(error.record), alert: error.record.errors.full_messages.to_sentence
       end

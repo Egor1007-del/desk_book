@@ -11,7 +11,7 @@
     .col-12.col-md-6
       = form.association :position, required: true,
         collection: Position.order(:name),
-        prompt: "Select position"
+        prompt: t("forms.select_position")
     .col-12.col-md-6
       = form.input :hired_on, as: :date, html5: true, required: true
     .col-12.col-md-6
@@ -23,16 +23,16 @@
     .col-12.col-md-6
       = form.input :password,
         required: user.new_record?,
-        hint: user.persisted? ? "Leave blank to keep current password" : nil
+        hint: user.persisted? ? t("forms.password_hint") : nil
     .col-12.col-md-6
       = form.input :password_confirmation, required: user.new_record?
     .col-12.col-md-6
       = form.input :role_name,
-        collection: Role::NAMES.map { |name| [name.capitalize, name] },
+        collection: Role::NAMES.map { |name| [t("roles.#{name}"), name] },
         include_blank: false,
-        label: "Role"
+        label: User.human_attribute_name(:role_name)
 
   .mt-4
-    = form.button :submit, "Save", class: "btn btn-primary"
-    = link_to "Cancel", user.persisted? ? admin_user_path(user) : admin_users_path,
+    = form.button :submit, t("actions.save"), class: "btn btn-primary"
+    = link_to t("actions.cancel"), user.persisted? ? admin_user_path(user) : admin_users_path,
       class: "btn btn-outline-secondary ms-2"

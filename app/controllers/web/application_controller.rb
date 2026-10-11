@@ -4,6 +4,7 @@ module Web
 
     layout "web/application"
 
+    around_action :switch_locale
     before_action :authenticate_user!, unless: :devise_controller?
     after_action :verify_authorized, unless: :devise_controller?
 
@@ -17,8 +18,24 @@ module Web
 
     private
 
+    def switch_locale(&action)
+      requested_locale = params[:locale]&.to_sym
+      session[:locale] = requested_locale if I18n.available_locales.include?(requested_locale)
+
+      locale = session[:locale]&.to_sym
+      locale = I18n.default_locale unless I18n.available_locales.include?(locale)
+      I18n.with_locale(locale, &action)
+    end
+
+    helper_method def locale_switch_path(locale)
+      return root_path(locale: locale) unless request.get?
+
+      query = request.query_parameters.merge(locale: locale).to_query
+      "#{request.path}?#{query}"
+    end
+
     def user_not_authorized
-      redirect_to root_path, alert: "You are not authorized to perform this action."
+      redirect_to root_path, alert: t("authorization.denied")
     end
   end
 end

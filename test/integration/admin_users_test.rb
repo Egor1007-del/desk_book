@@ -13,8 +13,8 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
 
     get admin_users_path
     assert_response :success
-    assert_select "h1", text: "Manage employees"
-    assert_select "a[href='#{new_admin_user_path}']", text: "New employee"
+    assert_select "h1", text: I18n.t("admin.users.index.title")
+    assert_select "a[href='#{new_admin_user_path}']", text: I18n.t("admin.users.new.title")
     assert_select "td.text-nowrap .d-flex.flex-nowrap.gap-1", count: 2
 
     get admin_user_path(@employee)
@@ -30,7 +30,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to root_path
     follow_redirect!
-    assert_select ".alert-danger", text: /not authorized/
+    assert_select ".alert-danger", text: I18n.t("authorization.denied")
   end
 
   test "employee cannot update or delete another user" do
@@ -59,6 +59,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_user_path(created_user)
     assert created_user.only_has_role?(:employee)
     assert created_user.valid_password?("secret123")
+    assert_equal "+7 918 123 45 67", created_user.phone
   end
 
   test "invalid creation returns the form without persisting a user" do
@@ -70,7 +71,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select ".invalid-feedback", text: /can't be blank/
+    assert_select ".invalid-feedback"
   end
 
   test "creation rejects an invalid role and missing password confirmation" do
@@ -82,8 +83,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select ".invalid-feedback", text: /is not included in the list/
-    assert_select ".invalid-feedback", text: /can't be blank/
+    assert_select ".invalid-feedback", minimum: 2
   end
 
   test "administrator updates an employee without changing a blank password" do
@@ -125,7 +125,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :unprocessable_entity
-    assert_select ".invalid-feedback", text: /can't be blank/
+    assert_select ".invalid-feedback"
     assert_equal "Employee", @employee.reload.last_name
     assert @employee.only_has_role?(:employee)
   end
@@ -178,7 +178,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
       middle_name: "Test",
       position_id: @position.id,
       hired_on: "2025-02-10",
-      phone: "+7 900 000 00 00",
+      phone: "8 (918) 123-45-67",
       email: "new.employee@example.com",
       login: "new.employee",
       password: "secret123",

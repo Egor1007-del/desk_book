@@ -1,26 +1,26 @@
-- content_for :title, "Employee directory"
+- content_for :title, t("users.index.title")
 
 .container.py-5
   .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
     div
-      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
-      h1.h2.mb-1 Employee directory
-      p.text-secondary.mb-0 = pluralize(@employees_count, "employee")
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.name")
+      h1.h2.mb-1 = t("users.index.title")
+      p.text-secondary.mb-0 = t("employees.count", count: @employees_count)
     .d-flex.flex-wrap.gap-2
-      = link_to "Download Excel", users_path(format: :xlsx),
+      = link_to t("actions.download_excel"), users_path(format: :xlsx),
         class: "btn btn-success", data: { turbo: false }
-      = link_to "Edit profile", edit_profile_path, class: "btn btn-outline-primary"
+      = link_to t("profiles.edit.title"), edit_profile_path, class: "btn btn-outline-primary"
 
   .table-responsive
     table.table.table-hover.table-striped.mb-0
       thead.table-light
         tr
-          th Full name
-          th Position
-          th Hired on
-          th Phone
-          th Email
-          th.text-nowrap Actions
+          th = t("attributes.full_name")
+          th = User.human_attribute_name(:position)
+          th = User.human_attribute_name(:hired_on)
+          th = User.human_attribute_name(:phone)
+          th = User.human_attribute_name(:email)
+          th.text-nowrap = t("actions.title")
       tbody
         - @users.each do |user|
           tr
@@ -32,4 +32,4 @@
             td.text-nowrap
               .d-flex.flex-nowrap.gap-1
                 - if policy(user).show?
-                  = link_to "View", user, class: "btn btn-sm btn-outline-primary"
+                  = link_to t("actions.view"), user, class: "btn btn-sm btn-outline-primary"

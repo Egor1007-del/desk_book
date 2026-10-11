@@ -63,6 +63,47 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "john.doe", user.login
   end
 
+  test "normalizes supported Russian mobile phone formats" do
+    phones = {
+      "9181234567" => "+7 918 123 45 67",
+      "89181234567" => "+7 918 123 45 67",
+      "+7 (918) 123-45-67" => "+7 918 123 45 67"
+    }
+
+    phones.each_with_index do |(phone, expected), index|
+      user = User.create!(valid_attributes.merge(login: "phone-#{index}", phone: phone))
+
+      assert_equal expected, user.phone
+    end
+  end
+
+  test "allows a blank phone" do
+    user = User.create!(valid_attributes.merge(phone: " "))
+
+    assert_nil user.phone
+  end
+
+  test "rejects an incomplete phone" do
+    user = User.new(valid_attributes.merge(phone: "8918"))
+
+    assert_not user.valid?
+    assert user.errors.of_kind?(:phone, :invalid)
+  end
+
+  test "rejects a non-Russian mobile phone" do
+    user = User.new(valid_attributes.merge(phone: "+1 202 555 01 23"))
+
+    assert_not user.valid?
+    assert user.errors.of_kind?(:phone, :invalid)
+  end
+
+  test "rejects letters in a phone" do
+    user = User.new(valid_attributes.merge(phone: "8 918 CALL NOW"))
+
+    assert_not user.valid?
+    assert user.errors.of_kind?(:phone, :invalid)
+  end
+
   test "requires login to be unique regardless of case and surrounding spaces" do
     User.create!(valid_attributes.merge(login: "john.doe"))
     duplicate = User.new(valid_attributes.merge(login: "  JOHN.DOE  "))

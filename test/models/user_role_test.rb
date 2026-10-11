@@ -19,7 +19,7 @@ class UserRoleTest < ActiveSupport::TestCase
         User.new(user_attributes).save_with_role!(role: :manager)
       end
 
-      assert_includes error.record.errors[:role_name], "is not included in the list"
+      assert error.record.errors.of_kind?(:role_name, :inclusion)
     end
   end
 
@@ -80,7 +80,7 @@ class UserRoleTest < ActiveSupport::TestCase
       admin.save_with_role!({ last_name: "Smith" }, role: :employee)
     end
 
-    assert_includes error.record.errors[:role_name], "cannot remove the last administrator"
+    assert error.record.errors.of_kind?(:role_name, :last_administrator)
     assert_equal "Doe", admin.reload.last_name
     assert admin.only_has_role?(:admin)
   end

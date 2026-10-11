@@ -1,45 +1,37 @@
-- content_for :title, "Desk Book"
+- content_for :title, t("brand.name")
 - github_url = "https://github.com/Egor1007-del/desk_book"
 
 .container.py-4.py-lg-5
   section.home-hero.rounded-4.p-4.p-lg-5.mb-4
     .row.align-items-center.g-5
       .col-lg-7
-        p.home-kicker.mb-3 People, roles, continuity
-        h1.display-5.fw-bold.mb-3
-          | A directory that remembers the people behind the work.
-        p.lead.text-secondary.mb-4
-          | Desk Book keeps employee contacts, positions and responsibilities in one clear place,
-          |  so the right colleague is never more than a few clicks away.
+        p.home-kicker.mb-3 = t("home.kicker")
+        h1.display-5.fw-bold.mb-3 = t("home.title")
+        p.lead.text-secondary.mb-4 = t("home.description")
         .d-flex.flex-wrap.gap-2
           - if policy([:admin, User]).index?
-            = link_to "Manage employees", admin_users_path, class: "btn btn-dark btn-lg"
+            = link_to t("admin.users.index.title"), admin_users_path, class: "btn btn-dark btn-lg"
           - else
-            = link_to "Open directory", users_path, class: "btn btn-dark btn-lg"
-          = link_to "Edit profile", edit_profile_path, class: "btn btn-outline-dark btn-lg"
+            = link_to t("users.index.open"), users_path, class: "btn btn-dark btn-lg"
+          = link_to t("profiles.edit.title"), edit_profile_path, class: "btn btn-outline-dark btn-lg"
           = link_to github_url, class: "btn btn-link text-dark",
             target: "_blank", rel: "noopener" do
-            | View on GitHub
+            = t("home.github")
       .col-lg-5
         .home-summary.rounded-4.p-4
-          p.text-uppercase.small.fw-semibold.text-secondary.mb-3 Current desk note
+          p.text-uppercase.small.fw-semibold.text-secondary.mb-3 = t("home.summary.title")
           p.fs-4.fw-semibold.mb-3 = current_user.full_name
-          p.display-4.fw-bold.mb-3 = pluralize(@employees_count, "employee")
-          p.text-secondary.mb-0
-            | Reliable directories are quiet infrastructure: they save a little time every day,
-            |  then save a great deal when someone urgently needs the right person.
+          p.display-4.fw-bold.mb-3 = t("employees.count", count: @employees_count)
+          p.text-secondary.mb-0 = t("home.summary.description")
 
   .row.g-4
     .col-lg-5
       .card.border-0.shadow-sm.h-100
         .card-body.p-4
-          p.home-kicker.mb-2 The desk-book parable
+          p.home-kicker.mb-2 = t("home.parable.title")
           blockquote.mb-0
-            p.fs-5.mb-3
-              | A team once labelled every key but forgot to write down which door it opened.
-              |  The labels were perfect; the work still stopped.
-            footer.text-secondary
-              | A useful directory connects information to a real person and a real responsibility.
+            p.fs-5.mb-3 = t("home.parable.body")
+            footer.text-secondary = t("home.parable.conclusion")
     .col-lg-7
       .accordion.shadow-sm#directory-guide
         .accordion-item
@@ -51,11 +43,10 @@
               aria-expanded="true"
               aria-controls="directory-purpose"
             )
-              | What does Desk Book solve?
+              = t("home.guide.purpose.question")
           #directory-purpose.accordion-collapse.collapse.show[data-bs-parent="#directory-guide"]
             .accordion-body
-              | It turns scattered contact details into one searchable register with a clear position,
-              |  phone number and email for every employee.
+              = t("home.guide.purpose.answer")
         .accordion-item
           h2.accordion-header
             button.accordion-button.collapsed(
@@ -65,11 +56,10 @@
               aria-expanded="false"
               aria-controls="directory-access"
             )
-              | How is access kept clear?
+              = t("home.guide.access.question")
           #directory-access.accordion-collapse.collapse[data-bs-parent="#directory-guide"]
             .accordion-body
-              | Employees can browse the directory and maintain their own account. Administrators manage
-              |  employee records, roles and organization analytics.
+              = t("home.guide.access.answer")
         .accordion-item
           h2.accordion-header
             button.accordion-button.collapsed(
@@ -79,7 +69,7 @@
               aria-expanded="false"
               aria-controls="directory-habit"
             )
-              | What makes a directory useful?
+              = t("home.guide.habit.question")
           #directory-habit.accordion-collapse.collapse[data-bs-parent="#directory-guide"]
             .accordion-body
-              | Small updates. A current phone number today prevents a long search tomorrow.
+              = t("home.guide.habit.answer")

@@ -1,8 +1,8 @@
-- content_for :title, "New employee"
+- content_for :title, t("admin.users.new.title")
 
 .container.py-5
   .mb-4
-    p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
-    h1.h2.mb-1 New employee
+    p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.admin")
+    h1.h2.mb-1 = t("admin.users.new.title")
 
   = render "form", user: @user

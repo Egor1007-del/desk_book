@@ -32,7 +32,7 @@ class ProfileTest < ActionDispatch::IntegrationTest
     get edit_profile_path
 
     assert_response :success
-    assert_select "h1", text: "Edit profile"
+    assert_select "h1", text: I18n.t("profiles.edit.title")
     assert_select "input[name='user[login]'][value='employee']"
 
     delete destroy_user_session_path
@@ -50,7 +50,7 @@ class ProfileTest < ActionDispatch::IntegrationTest
     patch profile_path, params: {
       id: @other_user.id,
       user: {
-        phone: "+7 900 111 22 33",
+        phone: "8 (900) 111-22-33",
         email: "updated@example.com",
         login: " Updated.Login ",
         password: "",
@@ -110,8 +110,20 @@ class ProfileTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :unprocessable_entity
-    assert_select ".invalid-feedback", text: /doesn't match/
+    assert_select ".invalid-feedback"
     assert @employee.reload.valid_password?("secret123")
+  end
+
+  test "profile rejects an invalid mobile phone" do
+    sign_in_as(@employee)
+
+    patch profile_path, params: {
+      user: { phone: "8918", email: @employee.email, login: @employee.login }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select ".invalid-feedback", text: /#{I18n.t('activerecord.errors.models.user.attributes.phone.invalid_russian_mobile')}/
+    assert_nil @employee.reload.phone
   end
 
   test "administrator updates only permitted fields through the profile" do

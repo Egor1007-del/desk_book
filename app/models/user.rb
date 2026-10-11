@@ -1,15 +1,18 @@
 class User < ApplicationRecord
+  PHONE_FORMAT = /\A\+7 \d{3} \d{3} \d{2} \d{2}\z/
+
   rolify
   devise :database_authenticatable, :validatable, authentication_keys: [ :login ]
 
   belongs_to :position, inverse_of: :users, counter_cache: true
 
-  before_validation :normalize_login
+  before_validation :normalize_login, :normalize_phone
 
   validates :last_name, :first_name, :hired_on, :login, presence: true
   validates :login, uniqueness: { case_sensitive: false }
   validates :password_confirmation, presence: true, if: -> { password.present? }
   validates :role_name, inclusion: { in: Role::NAMES }, if: -> { defined?(@role_name) }
+  validates :phone, format: { with: PHONE_FORMAT, message: :invalid_russian_mobile }, allow_blank: true
 
   def full_name
     [ last_name, first_name, middle_name ].compact_blank.join(" ")
@@ -64,7 +67,7 @@ class User < ApplicationRecord
     return if next_role.to_s == "admin"
     return if User.with_role(:admin).where.not(id: id).exists?
 
-    errors.add(:role_name, "cannot remove the last administrator")
+    errors.add(:role_name, :last_administrator)
     raise ActiveRecord::RecordInvalid, self
   end
 
@@ -74,5 +77,19 @@ class User < ApplicationRecord
 
   def normalize_login
     self.login = login&.strip&.downcase
+  end
+
+  def normalize_phone
+    self.phone = nil if phone.blank?
+    return if phone.blank?
+
+    raw_phone = phone.strip
+    return unless raw_phone.match?(/\A(?:\+7|[78])?[\d\s()-]+\z/)
+
+    digits = raw_phone.delete("^0-9")
+    digits = digits[1..] if digits.length == 11 && digits.start_with?("7", "8")
+    return unless digits.match?(/\A9\d{9}\z/)
+
+    self.phone = digits.sub(/\A(\d{3})(\d{3})(\d{2})(\d{2})\z/, "+7 \\1 \\2 \\3 \\4")
   end
 end

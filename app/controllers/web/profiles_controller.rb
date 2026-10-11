@@ -12,7 +12,7 @@ module Web
 
       if @user.update(attributes)
         bypass_sign_in(@user) if attributes[:password].present?
-        redirect_to edit_profile_path, notice: "Profile updated"
+        redirect_to edit_profile_path, notice: t("flash.profile.updated")
       else
         render :edit, status: :unprocessable_entity
       end

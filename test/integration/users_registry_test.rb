@@ -39,15 +39,15 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     get users_path
 
     assert_response :success
-    assert_select "title", text: "Employee directory"
-    assert_select "h1", text: "Employee directory"
-    assert_select "th", text: "Full name"
-    assert_select "th", text: "Position"
-    assert_select "th", text: "Hired on"
-    assert_select "th", text: "Phone"
-    assert_select "th", text: "Email"
-    assert_select "th", text: "Login", count: 0
-    assert_select "th", text: "Role", count: 0
+    assert_select "title", text: I18n.t("users.index.title")
+    assert_select "h1", text: I18n.t("users.index.title")
+    assert_select "th", text: I18n.t("attributes.full_name")
+    assert_select "th", text: User.human_attribute_name(:position)
+    assert_select "th", text: User.human_attribute_name(:hired_on)
+    assert_select "th", text: User.human_attribute_name(:phone)
+    assert_select "th", text: User.human_attribute_name(:email)
+    assert_select "th", text: User.human_attribute_name(:login), count: 0
+    assert_select "th", text: User.human_attribute_name(:role_name), count: 0
     assert_select "td", text: @employee.full_name
     assert_select "td", text: @admin.full_name
   end
@@ -60,12 +60,12 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_users_path
     follow_redirect!
     assert_response :success
-    assert_select "th", text: "Login"
-    assert_select "th", text: "Role"
+    assert_select "th", text: User.human_attribute_name(:login)
+    assert_select "th", text: User.human_attribute_name(:role_name)
     assert_select "td", text: @employee.login
     assert_select "td", text: @admin.login
-    assert_select "td", text: "Employee"
-    assert_select "td", text: "Admin"
+    assert_select "td", text: I18n.t("roles.employee")
+    assert_select "td", text: I18n.t("roles.admin")
     assert_select "td.text-nowrap .d-flex.flex-nowrap.gap-1", count: 2
   end
 
@@ -77,11 +77,11 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "title", text: @employee.full_name
     assert_select "h1", text: @employee.full_name
-    assert_select "dt", text: "Phone"
+    assert_select "dt", text: User.human_attribute_name(:phone)
     assert_select "dd", text: @employee.phone
     assert_select "dd", text: @employee.email
-    assert_select "dt", text: "Login", count: 0
-    assert_select "dt", text: "Role", count: 0
+    assert_select "dt", text: User.human_attribute_name(:login), count: 0
+    assert_select "dt", text: User.human_attribute_name(:role_name), count: 0
     assert_select "a[href='#{edit_admin_user_path(@employee)}']", count: 0
     assert_select "form[action='#{admin_user_path(@employee)}']", count: 0
   end
@@ -94,11 +94,11 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_user_path(@employee)
     follow_redirect!
     assert_response :success
-    assert_select "dt", text: "Login"
+    assert_select "dt", text: User.human_attribute_name(:login)
     assert_select "dd", text: @employee.login
-    assert_select "dt", text: "Role"
-    assert_select "dd", text: "Employee"
-    assert_select "a[href='#{edit_admin_user_path(@employee)}']", text: "Edit"
+    assert_select "dt", text: User.human_attribute_name(:role_name)
+    assert_select "dd", text: I18n.t("roles.employee")
+    assert_select "a[href='#{edit_admin_user_path(@employee)}']", text: I18n.t("actions.edit")
   end
 
   test "employee cannot access admin edit" do
@@ -108,7 +108,7 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
 
     assert_response :redirect
     follow_redirect!
-    assert_select ".alert-danger", text: /not authorized/
+    assert_select ".alert-danger", text: I18n.t("authorization.denied")
   end
 
   test "admin can access admin edit" do
@@ -122,14 +122,14 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
   test "employee home links to the public directory" do
     sign_in_as(@employee)
 
-    assert_select "a[href='#{users_path}']", text: "Open directory"
+    assert_select "a[href='#{users_path}']", text: I18n.t("users.index.open")
     assert_select "a[href='#{admin_users_path}']", count: 0
   end
 
   test "admin home links to management" do
     sign_in_as(@admin)
 
-    assert_select "a[href='#{admin_users_path}']", text: "Manage employees"
+    assert_select "a[href='#{admin_users_path}']", text: I18n.t("admin.users.index.title")
     assert_select "a[href='#{users_path}']", count: 0
   end
 
@@ -138,14 +138,14 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     get admin_users_path
 
     assert_response :success
-    assert_select "th", text: "Phone"
-    assert_select "th", text: "Email"
-    assert_select "th", text: "Hired on"
+    assert_select "th", text: User.human_attribute_name(:phone)
+    assert_select "th", text: User.human_attribute_name(:email)
+    assert_select "th", text: User.human_attribute_name(:hired_on)
     assert_select "td", text: @employee.phone
     assert_select "td", text: @employee.email
     assert_select "td", text: I18n.l(@employee.hired_on, format: :short)
-    assert_select "a[href='#{edit_profile_path}']", text: "Edit profile"
-    assert_select "a[href='#{users_path(format: :xlsx)}'][data-turbo='false']", text: "Download Excel"
+    assert_select "a[href='#{edit_profile_path}']", text: I18n.t("profiles.edit.title")
+    assert_select "a[href='#{users_path(format: :xlsx)}'][data-turbo='false']", text: I18n.t("actions.download_excel")
     assert_select "a[href='#{users_path}']", count: 0
   end
 
@@ -162,7 +162,7 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     get users_path
 
     assert_response :success
-    assert_select "p", text: "2 employees"
+    assert_select "p", text: I18n.t("employees.count", count: 2)
   end
 
   test "management shows the total number of employees" do
@@ -170,7 +170,7 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     get admin_users_path
 
     assert_response :success
-    assert_select "p", text: "2 employees"
+    assert_select "p", text: I18n.t("employees.count", count: 2)
   end
 
   private
