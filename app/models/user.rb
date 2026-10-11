@@ -2,7 +2,7 @@ class User < ApplicationRecord
   rolify
   devise :database_authenticatable, :validatable, authentication_keys: [ :login ]
 
-  belongs_to :position, inverse_of: :users
+  belongs_to :position, inverse_of: :users, counter_cache: true
 
   before_validation :normalize_login
 

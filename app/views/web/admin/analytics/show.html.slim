@@ -1,0 +1,35 @@
+- content_for :title, "Employee analytics"
+
+.container.py-5
+  .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3.mb-4
+    div
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
+      h1.h2.mb-1 Employee analytics
+      p.text-secondary.mb-0 Latest hires by position
+    = link_to "Manage employees", admin_users_path, class: "btn btn-outline-primary"
+
+  - if @positions.empty?
+    p.text-secondary No positions yet.
+
+  - @positions.each do |position|
+    section.card.mb-4 id=dom_id(position)
+      .card-header.d-flex.align-items-center.justify-content-between.gap-3
+        h2.h5.mb-0 = position.name
+        span.badge.text-bg-secondary
+          | Total employees: #{position.users_count}
+      .card-body
+        - employees = @recent_employees.fetch(position)
+        - if employees.empty?
+          p.text-secondary.mb-0 No employees in this position.
+        - else
+          .table-responsive
+            table.table.table-striped.align-middle.mb-0
+              thead
+                tr
+                  th Full name
+                  th Hired on
+              tbody
+                - employees.each do |employee|
+                  tr
+                    td = link_to employee.full_name, user_path(employee)
+                    td.text-nowrap = l(employee.hired_on, format: :short)

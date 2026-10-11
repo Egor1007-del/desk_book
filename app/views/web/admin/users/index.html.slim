@@ -6,7 +6,10 @@
       p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
       h1.h2.mb-1 Manage employees
       p.text-secondary.mb-0 #{@users.size} employee#{"s" if @users.size != 1}
-    = link_to "New employee", new_admin_user_path, class: "btn btn-primary"
+    .d-flex.flex-wrap.gap-2
+      - if policy([:admin, :analytics]).show?
+        = link_to "Analytics", admin_analytics_path, class: "btn btn-outline-primary"
+      = link_to "New employee", new_admin_user_path, class: "btn btn-primary"
 
   .table-responsive
     table.table.table-hover.table-striped.align-middle.mb-0

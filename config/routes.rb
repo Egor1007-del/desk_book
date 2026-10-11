@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
     namespace :admin do
       resources :users
+      resource :analytics, only: :show, controller: :analytics
     end
   end
 
