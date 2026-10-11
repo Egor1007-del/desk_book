@@ -5,8 +5,11 @@
     div
       p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book Admin
       h1.h2.mb-1 Manage employees
-      p.text-secondary.mb-0 #{@users.size} employee#{"s" if @users.size != 1}
+      p.text-secondary.mb-0 = pluralize(@employees_count, "employee")
     .d-flex.flex-wrap.gap-2
+      = link_to "Download Excel", users_path(format: :xlsx),
+        class: "btn btn-success", data: { turbo: false }
+      = link_to "Edit profile", edit_profile_path, class: "btn btn-outline-primary"
       - if policy([:admin, :analytics]).show?
         = link_to "Analytics", admin_analytics_path, class: "btn btn-outline-primary"
       = link_to "New employee", new_admin_user_path, class: "btn btn-primary"
@@ -17,6 +20,9 @@
         tr
           th Full name
           th Position
+          th Hired on
+          th Phone
+          th Email
           th Login
           th Role
           th.text-nowrap Actions
@@ -25,6 +31,9 @@
           tr
             td = link_to user.full_name, admin_user_path(user)
             td = user.position.name
+            td.text-nowrap = l(user.hired_on, format: :short)
+            td = user.phone.presence || "—"
+            td = user.email.presence || "—"
             td = user.login
             td = user.role_name.capitalize
             td.text-nowrap
@@ -34,6 +43,3 @@
                   = button_to "Delete", admin_user_path(user), method: :delete,
                     class: "btn btn-sm btn-outline-danger",
                     data: { turbo_confirm: "Delete #{user.full_name}?" }
-
-  .mt-4
-    = link_to "Public directory", users_path, class: "btn btn-outline-secondary"

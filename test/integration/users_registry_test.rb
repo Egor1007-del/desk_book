@@ -57,6 +57,8 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
 
     get users_path
 
+    assert_redirected_to admin_users_path
+    follow_redirect!
     assert_response :success
     assert_select "th", text: "Login"
     assert_select "th", text: "Role"
@@ -89,6 +91,8 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
 
     get user_path(@employee)
 
+    assert_redirected_to admin_user_path(@employee)
+    follow_redirect!
     assert_response :success
     assert_select "dt", text: "Login"
     assert_select "dd", text: @employee.login
@@ -113,6 +117,60 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     get edit_admin_user_path(@employee)
 
     assert_response :success
+  end
+
+  test "employee home links to the public directory" do
+    sign_in_as(@employee)
+
+    assert_select "a[href='#{users_path}']", text: "Directory"
+    assert_select "a[href='#{admin_users_path}']", count: 0
+  end
+
+  test "admin home links to management" do
+    sign_in_as(@admin)
+
+    assert_select "a[href='#{admin_users_path}']", text: "Manage employees"
+    assert_select "a[href='#{users_path}']", count: 0
+  end
+
+  test "management shows contact details and registry links" do
+    sign_in_as(@admin)
+    get admin_users_path
+
+    assert_response :success
+    assert_select "th", text: "Phone"
+    assert_select "th", text: "Email"
+    assert_select "th", text: "Hired on"
+    assert_select "td", text: @employee.phone
+    assert_select "td", text: @employee.email
+    assert_select "td", text: I18n.l(@employee.hired_on, format: :short)
+    assert_select "a[href='#{edit_profile_path}']", text: "Edit profile"
+    assert_select "a[href='#{users_path(format: :xlsx)}'][data-turbo='false']", text: "Download Excel"
+    assert_select "a[href='#{users_path}']", count: 0
+  end
+
+  test "admin card does not link to the public card" do
+    sign_in_as(@admin)
+    get admin_user_path(@employee)
+
+    assert_response :success
+    assert_select "a[href='#{user_path(@employee)}']", count: 0
+  end
+
+  test "employee directory shows the total number of employees" do
+    sign_in_as(@employee)
+    get users_path
+
+    assert_response :success
+    assert_select "p", text: "2 employees"
+  end
+
+  test "management shows the total number of employees" do
+    sign_in_as(@admin)
+    get admin_users_path
+
+    assert_response :success
+    assert_select "p", text: "2 employees"
   end
 
   private

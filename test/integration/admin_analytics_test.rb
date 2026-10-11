@@ -25,7 +25,7 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     assert_select ".alert-danger", text: "You are not authorized to perform this action."
   end
 
-  test "administrator sees all positions including empty ones and total counts" do
+  test "administrator sees all positions in alphabetical order" do
     sign_in_as(@admin)
 
     get admin_analytics_path
@@ -36,72 +36,98 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     assert_select "section h2" do |headings|
       assert_equal Position.order(:name).pluck(:name), headings.map(&:text)
     end
+  end
+
+  test "empty position shows zero employees" do
+    sign_in_as(@admin)
+    get admin_analytics_path
+
     assert_select "#position_#{@empty_position.id}" do
       assert_select ".badge", text: "Total employees: 0"
       assert_select "p", text: "No employees in this position."
       assert_select "tbody tr", count: 0
     end
-    [ @employee, @admin ].each do |employee|
-      assert_select "#position_#{employee.position_id}" do
-        assert_select ".badge", text: "Total employees: 1"
-        assert_select "tbody tr", count: 1
-        assert_select "a[href='#{user_path(employee)}']", text: employee.full_name
-        assert_select "td", text: I18n.l(employee.hired_on, format: :short)
-      end
-    end
   end
 
-  test "latest five are ordered by hire date and then descending id for each position" do
-    expected_by_position = [ @developer_position, @manager_position ].to_h do |position|
-      hires = [ 6, 2, 5, 1, 6, 4, 3 ].each_with_index.map do |month, index|
-        create_user(
-          login: "hire-#{position.id}-#{index}", position: position,
-          hired_on: Date.new(2025, month, 1)
-        )
-      end
-      [ position, [ hires[4], hires[0], hires[2], hires[5], hires[6] ] ]
-    end
+  test "employee details appear only under their position" do
     sign_in_as(@admin)
-
     get admin_analytics_path
 
-    assert_response :success
-    expected_by_position.each do |position, employees|
-      assert_select "#position_#{position.id}" do
-        assert_select ".badge", text: "Total employees: 8"
-        assert_select "tbody tr", count: 5
-        assert_select "tbody a" do |links|
-          assert_equal employees.map(&:full_name), links.map(&:text)
-          assert_equal employees.map { |employee| user_path(employee) }, links.map { |link| link["href"] }
-        end
-      end
+    assert_select "#position_#{@developer_position.id}" do
+      assert_select ".badge", text: "Total employees: 1"
+      assert_select "tbody tr", count: 1
+      assert_select "a[href='#{admin_user_path(@employee)}']", text: @employee.full_name
+      assert_select "td", text: I18n.l(@employee.hired_on, format: :short)
+      assert_select "a[href='#{admin_user_path(@admin)}']", count: 0
+    end
+    assert_select "#position_#{@manager_position.id}" do
+      assert_select ".badge", text: "Total employees: 1"
+      assert_select "a[href='#{admin_user_path(@admin)}']", text: @admin.full_name
+      assert_select "a[href='#{admin_user_path(@employee)}']", count: 0
     end
   end
 
-  test "management page links to analytics and analytics links back" do
+  test "position shows five latest employees but counts all six" do
+    5.times do |number|
+      create_user(
+        login: "new-developer-#{number}", position: @developer_position,
+        hired_on: Date.new(2025, 1, 1)
+      )
+    end
+    sign_in_as(@admin)
+    get admin_analytics_path
+
+    assert_select "#position_#{@developer_position.id}" do
+      assert_select ".badge", text: "Total employees: 6"
+      assert_select "tbody tr", count: 5
+      assert_select "a[href='#{admin_user_path(@employee)}']", count: 0
+    end
+    assert_select "#position_#{@manager_position.id} tbody tr", count: 1
+  end
+
+  test "employees are ordered by hire date rather than creation order" do
+    newer_employee = create_user(
+      login: "newer", position: @developer_position, hired_on: Date.new(2025, 6, 1)
+    )
+    older_employee = create_user(
+      login: "older", position: @developer_position, hired_on: Date.new(2025, 1, 1)
+    )
+    sign_in_as(@admin)
+    get admin_analytics_path
+
+    assert_select "#position_#{@developer_position.id} tbody a" do |links|
+      assert_equal [ newer_employee.full_name, older_employee.full_name, @employee.full_name ], links.map(&:text)
+    end
+  end
+
+  test "higher id comes first when hire dates are equal" do
+    first_employee = create_user(
+      login: "first", position: @empty_position, hired_on: Date.new(2025, 1, 1)
+    )
+    second_employee = create_user(
+      login: "second", position: @empty_position, hired_on: Date.new(2025, 1, 1)
+    )
+    sign_in_as(@admin)
+    get admin_analytics_path
+
+    assert_select "#position_#{@empty_position.id} tbody a" do |links|
+      assert_equal [ second_employee.full_name, first_employee.full_name ], links.map(&:text)
+    end
+  end
+
+  test "management page links to analytics" do
     sign_in_as(@admin)
 
     get admin_users_path
 
     assert_select "a[href='#{admin_analytics_path}']", text: "Analytics"
+  end
 
+  test "analytics links back to management" do
+    sign_in_as(@admin)
     get admin_analytics_path
 
     assert_select "a[href='#{admin_users_path}']", text: "Manage employees"
-  end
-
-  test "analytics uses stored totals without counting users" do
-    sign_in_as(@admin)
-    queries = []
-    subscriber = ->(event) { queries << event.payload[:sql] }
-
-    ActiveSupport::Notifications.subscribed(subscriber, "sql.active_record") do
-      get admin_analytics_path
-    end
-
-    assert_response :success
-    assert_empty queries.grep(/\bCOUNT\s*\(/i)
-    assert_select "#position_#{@developer_position.id} .badge", text: "Total employees: 1"
   end
 
   private

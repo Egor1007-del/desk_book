@@ -6,7 +6,10 @@
       p.text-uppercase.text-secondary.small.fw-semibold.mb-2 Desk Book
       h1.h2.mb-1 Employee directory
       p.text-secondary.mb-0 You are signed in as #{current_user.full_name}.
-    .d-flex.gap-2
-      = link_to "Directory", users_path, class: "btn btn-primary"
+    .d-flex.flex-wrap.gap-2
+      - if policy([:admin, User]).index?
+        = link_to "Manage employees", admin_users_path, class: "btn btn-primary"
+      - else
+        = link_to "Directory", users_path, class: "btn btn-primary"
       = link_to "Edit profile", edit_profile_path, class: "btn btn-outline-primary"
       = button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn btn-outline-secondary"

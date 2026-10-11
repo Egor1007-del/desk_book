@@ -6,6 +6,7 @@ module Web
       def index
         @users = policy_scope([ :admin, User ]).includes(:position, :roles).order(:last_name, :first_name)
         authorize [ :admin, User ]
+        @employees_count = Position.sum(:users_count)
       end
 
       def show

@@ -31,5 +31,5 @@
               tbody
                 - employees.each do |employee|
                   tr
-                    td = link_to employee.full_name, user_path(employee)
+                    td = link_to employee.full_name, admin_user_path(employee)
                     td.text-nowrap = l(employee.hired_on, format: :short)
