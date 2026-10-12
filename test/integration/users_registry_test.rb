@@ -69,21 +69,21 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     assert_select "td.text-nowrap .d-flex.flex-nowrap.gap-1", count: 2
   end
 
-  test "employee sees own card without login and role" do
+  test "employee sees another user's card without login and role" do
     sign_in_as(@employee)
 
-    get user_path(@employee)
+    get user_path(@admin)
 
     assert_response :success
-    assert_select "title", text: @employee.full_name
-    assert_select "h1", text: @employee.full_name
+    assert_select "title", text: @admin.full_name
+    assert_select "h1", text: @admin.full_name
     assert_select "dt", text: User.human_attribute_name(:phone)
-    assert_select "dd", text: @employee.phone
-    assert_select "dd", text: @employee.email
+    assert_select "dd", text: @admin.phone
+    assert_select "dd", text: @admin.email
     assert_select "dt", text: User.human_attribute_name(:login), count: 0
     assert_select "dt", text: User.human_attribute_name(:role_name), count: 0
-    assert_select "a[href='#{edit_admin_user_path(@employee)}']", count: 0
-    assert_select "form[action='#{admin_user_path(@employee)}']", count: 0
+    assert_select "a[href='#{edit_admin_user_path(@admin)}']", count: 0
+    assert_select "form[action='#{admin_user_path(@admin)}']", count: 0
   end
 
   test "admin sees any card with login and role" do

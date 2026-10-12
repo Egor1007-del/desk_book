@@ -155,6 +155,33 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert @admin.reload.only_has_role?(:admin)
   end
 
+  test "administrator can demote self when another administrator remains" do
+    create_user(login: "second.admin", role: :admin, position: @other_position)
+    sign_in_as(@admin)
+
+    patch admin_user_path(@admin), params: {
+      user: update_params(@admin, role_name: "employee")
+    }
+
+    assert_redirected_to admin_user_path(@admin)
+    assert @admin.reload.only_has_role?(:employee)
+    get root_path
+    assert_response :success
+  end
+
+  test "administrator can delete self when another administrator remains" do
+    create_user(login: "second.admin", role: :admin, position: @other_position)
+    sign_in_as(@admin)
+
+    assert_difference -> { User.count }, -1 do
+      delete admin_user_path(@admin)
+    end
+
+    assert_redirected_to admin_users_path
+    follow_redirect!
+    assert_redirected_to new_user_session_path
+  end
+
   private
 
   def create_user(login:, role:, position:)
@@ -187,17 +214,17 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     }
   end
 
-  def update_params(overrides = {})
+  def update_params(user = @employee, **overrides)
     {
-      last_name: @employee.last_name,
-      first_name: @employee.first_name,
-      middle_name: @employee.middle_name,
-      position_id: @employee.position_id,
-      hired_on: @employee.hired_on.iso8601,
-      phone: @employee.phone,
-      email: @employee.email,
-      login: @employee.login,
-      role_name: @employee.role_name
+      last_name: user.last_name,
+      first_name: user.first_name,
+      middle_name: user.middle_name,
+      position_id: user.position_id,
+      hired_on: user.hired_on.iso8601,
+      phone: user.phone,
+      email: user.email,
+      login: user.login,
+      role_name: user.role_name
     }.merge(overrides)
   end
 
