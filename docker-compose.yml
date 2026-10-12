@@ -1,0 +1,31 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:80"
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY}
+      DATABASE_URL: postgresql://desk_book:${POSTGRES_PASSWORD:-desk_book}@db:5432/desk_book_production
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: desk_book_production
+      POSTGRES_USER: desk_book
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-desk_book}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U desk_book -d desk_book_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -1,8 +1,12 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
+# If running the Rails server, migrate and seed the external PostgreSQL database.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
-  ./bin/rails db:prepare
+  ./bin/rails db:migrate
+  ./bin/rails db:seed
+
+  # Render provides PORT; Thruster calls its public listener HTTP_PORT.
+  export HTTP_PORT="${HTTP_PORT:-${PORT:-80}}"
 fi
 
 exec "${@}"
