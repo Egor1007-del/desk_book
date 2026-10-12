@@ -32,6 +32,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "nav[aria-label='#{I18n.t('navigation.main')}']" do
       assert_select "a[href='#{root_path}']", text: I18n.t("navigation.home")
       assert_select "a[href='#{new_user_session_path}']", text: I18n.t("navigation.sign_in")
+      assert_select ".language-switcher a", count: 2
+      assert_select ".language-switcher a.btn", count: 0
       assert_select "form[action='#{destroy_user_session_path}']", count: 0
     end
   end
@@ -104,7 +106,12 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "nav[aria-label='#{I18n.t('navigation.main')}']" do
       assert_select "a[href='#{root_path}']", text: I18n.t("navigation.home")
       assert_select "form[action='#{destroy_user_session_path}'] button", text: I18n.t("navigation.sign_out")
+      assert_select ".language-switcher a", count: 2
+      assert_select ".language-switcher a.btn", count: 0
       assert_select "a[href='#{new_user_session_path}']", count: 0
+
+      controls = css_select(".container > div.d-flex.align-items-center.gap-2").first
+      assert_equal %w[A SPAN DIV FORM], controls.element_children.map(&:name).map(&:upcase)
     end
   end
 

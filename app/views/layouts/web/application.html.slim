@@ -22,14 +22,20 @@ html lang=I18n.locale
           span.brand-mark DB
           span = t("brand.name")
         .d-flex.align-items-center.gap-2
-          .btn-group[role="group" aria-label=t("navigation.language")]
-            - I18n.available_locales.each do |locale|
-              = link_to locale.to_s.upcase, locale_switch_path(locale),
-                class: "btn btn-sm #{I18n.locale == locale ? 'btn-dark' : 'btn-outline-secondary'}",
-                lang: locale
           = link_to t("navigation.home"), root_path, class: "btn btn-sm btn-outline-secondary"
           - if user_signed_in?
             span.d-none.d-md-inline.text-secondary.small = current_user.full_name
+          .language-switcher.d-flex.align-items-center.gap-1[aria-label=t("navigation.language")]
+            - I18n.available_locales.each_with_index do |locale, index|
+              - active_locale = I18n.locale == locale
+              - locale_class = active_locale ? "fw-semibold text-body" : "text-secondary"
+              = link_to locale.to_s.upcase, locale_switch_path(locale),
+                class: "small text-decoration-none #{locale_class}",
+                lang: locale,
+                aria: { current: active_locale ? "true" : nil }
+              - unless index == I18n.available_locales.length - 1
+                span.text-secondary.opacity-50[aria-hidden="true"] = "|"
+          - if user_signed_in?
             = button_to t("navigation.sign_out"), destroy_user_session_path, method: :delete,
               class: "btn btn-sm btn-dark"
           - else
