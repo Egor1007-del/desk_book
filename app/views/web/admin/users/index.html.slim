@@ -13,7 +13,7 @@
       = link_to t("profiles.edit.title"), edit_profile_path, class: "btn btn-outline-primary"
       - if policy([:admin, :analytics]).show?
         = link_to t("admin.analytics.title"), admin_analytics_path, class: "btn btn-outline-primary"
-      = link_to t("admin.users.new.title"), new_admin_user_path,
+      = link_to t("admin.users.new.title"), new_admin_user_path(page: @pagy.page == 1 ? nil : @pagy.page),
         class: "btn btn-primary", data: { turbo_frame: "admin_user_form" }
 
   = turbo_frame_tag "admin_user_form",
@@ -32,4 +32,7 @@
           th = User.human_attribute_name(:role_name)
           th.text-nowrap = t("actions.title")
       tbody#admin_users_table_body
-        = render "users", users: @users
+        = render "users", users: @users, current_page: @pagy.page
+
+  #admin_users_pagination
+    = render "web/users/pagination", pagy: @pagy

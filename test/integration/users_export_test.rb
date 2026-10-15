@@ -81,6 +81,27 @@ class UsersExportTest < ActionDispatch::IntegrationTest
       text: I18n.t("actions.download_excel")
   end
 
+  test "export is not limited by HTML pagination" do
+    extra_users = 9.times.map do |index|
+      create_user(
+        login: format("extra-%02d", index),
+        role: :employee,
+        position: @employee.position,
+        last_name: format("Test%02d", index),
+        first_name: "User",
+        phone: nil,
+        email: nil
+      )
+    end
+    sign_in_as(@employee)
+
+    get users_path(format: :xlsx, page: 2)
+
+    assert_xlsx_response
+    assert_equal 12, worksheet_rows.size
+    assert_includes worksheet_rows, [ extra_users.last.full_name, @employee.position.name, nil, nil ]
+  end
+
   private
 
   def create_user(login:, role:, position:, last_name:, first_name:, middle_name: nil, phone:, email:)

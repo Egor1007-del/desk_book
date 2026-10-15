@@ -173,7 +173,64 @@ class UsersRegistryTest < ActionDispatch::IntegrationTest
     assert_select "p", text: I18n.t("employees.count", count: 2)
   end
 
+  test "employee directory paginates ten users and normalizes page numbers" do
+    users = 11.times.map { |index| create_directory_user(index) }
+    sign_in_as(@employee)
+
+    get users_path
+    assert_response :success
+    assert_select "tbody tr", count: 10
+    assert_select "nav[aria-label='#{I18n.t("pagination.navigation")}']"
+    assert_select "a[href='#{users_path(page: 2)}']", text: "2"
+    assert_select "td", text: users.fetch(8).full_name, count: 0
+
+    get users_path(page: 2)
+    assert_response :success
+    assert_select "tbody tr", count: 3
+    assert_select ".page-item.active .page-link[aria-current='page']", text: "2"
+    assert_select "td", text: users.fetch(8).full_name
+
+    get users_path(page: 999)
+    assert_response :success
+    assert_select "tbody tr", count: 0
+
+    get users_path(page: "invalid")
+    assert_response :success
+    assert_select "tbody tr", count: 10
+    assert_select ".page-item.active .page-link", text: "1"
+
+    get users_path(page: -2)
+    assert_response :success
+    assert_select "tbody tr", count: 10
+    assert_select ".page-item.active .page-link", text: "1"
+  end
+
+  test "pagination controls use the selected locale" do
+    9.times { |index| create_directory_user(index) }
+    sign_in_as(@employee)
+
+    get users_path(locale: :en)
+
+    assert_response :success
+    assert_select "nav[aria-label='#{I18n.t("pagination.navigation", locale: :en)}']"
+    assert_select ".page-item.next .page-link[aria-label='Next']"
+  end
+
   private
+
+  def create_directory_user(index)
+    User.new(
+      last_name: format("Test%02d", index),
+      first_name: "User",
+      position: @position,
+      hired_on: Date.new(2024, 1, 15),
+      login: format("test%02d", index),
+      password: "secret123",
+      password_confirmation: "secret123"
+    ).tap do |user|
+      user.save_with_role!(role: :employee)
+    end
+  end
 
   def sign_in_as(user)
     post user_session_path, params: {

@@ -54,6 +54,8 @@ en:
     count:
       one: "%{count} employee"
       other: "%{count} employees"
+  pagination:
+    navigation: "Employee directory pages"
   roles:
     admin: "Admin"
     employee: "Employee"

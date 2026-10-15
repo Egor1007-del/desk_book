@@ -1,5 +1,6 @@
 module Web
   class ApplicationController < ::ApplicationController
+    include Pagy::Method
     include Pundit::Authorization
 
     layout "web/application"
@@ -24,7 +25,10 @@ module Web
 
       locale = session[:locale]&.to_sym
       locale = I18n.default_locale unless I18n.available_locales.include?(locale)
+      Pagy::I18n.locale = locale
       I18n.with_locale(locale, &action)
+    ensure
+      Pagy::I18n.locale = nil
     end
 
     helper_method def locale_switch_path(locale)

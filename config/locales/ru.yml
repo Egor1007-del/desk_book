@@ -27,6 +27,8 @@ ru:
       few: "%{count} сотрудника"
       many: "%{count} сотрудников"
       other: "%{count} сотрудника"
+  pagination:
+    navigation: "Страницы справочника сотрудников"
   roles:
     admin: "Администратор"
     employee: "Сотрудник"

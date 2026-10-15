@@ -65,7 +65,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal Mime[:turbo_stream].to_s, response.media_type
     assert_turbo_stream_targets "admin_users_table_body", "admin_users_count",
-      "admin_user_form", "flash_messages"
+      "admin_users_pagination", "admin_user_form", "flash_messages"
     assert_includes response.body, I18n.t("flash.users.created")
   end
 
@@ -90,15 +90,15 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     }, headers: turbo_stream_headers
     assert_response :success
     assert_turbo_stream_targets "admin_users_table_body", "admin_users_count",
-      "admin_user_form", "flash_messages"
+      "admin_users_pagination", "admin_user_form", "flash_messages"
     assert_equal "Updated", @employee.reload.last_name
 
     assert_difference -> { User.count }, -1 do
       delete admin_user_path(@employee), headers: turbo_stream_headers
     end
     assert_response :success
-    assert_select "turbo-stream[action='remove'][target='user_#{@employee.id}']", count: 1
-    assert_turbo_stream_targets "admin_users_count", "flash_messages"
+    assert_turbo_stream_targets "admin_users_table_body", "admin_users_count",
+      "admin_users_pagination", "flash_messages"
   end
 
   test "employee cannot access administrative management" do
@@ -258,6 +258,48 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_users_path
     follow_redirect!
     assert_redirected_to new_user_session_path
+  end
+
+  test "management pagination preserves the current page in Turbo actions" do
+    users = 11.times.map do |index|
+      create_user(login: format("test%02d", index), role: :employee, position: @position)
+    end
+    sign_in_as(@admin)
+
+    get admin_users_path(page: 2)
+
+    assert_response :success
+    assert_select "tbody#admin_users_table_body tr", count: 3
+    assert_select ".page-item.active .page-link[aria-current='page']", text: "2"
+    assert_select "a[href='#{new_admin_user_path(page: 2)}'][data-turbo-frame='admin_user_form']"
+    assert_select "a[href='#{edit_admin_user_path(users.fetch(8), page: 2)}']"
+    assert_select "form[action='#{admin_user_path(users.fetch(8), page: 2)}']"
+
+    get edit_admin_user_path(users.fetch(8), page: 2), headers: { "Turbo-Frame" => "admin_user_form" }
+    assert_response :success
+    assert_select "input[type='hidden'][name='page'][value='2']"
+
+    patch admin_user_path(users.fetch(8)), params: {
+      page: 2,
+      user: update_params(users.fetch(8), first_name: "Changed")
+    }, headers: turbo_stream_headers
+    assert_response :success
+    assert_select "turbo-stream[target='admin_users_pagination'] .page-item.active .page-link", text: "2"
+    assert_select "turbo-stream[target='admin_users_table_body']", text: /Changed/
+  end
+
+  test "deleting the only user on the last page redirects to the previous page" do
+    users = 9.times.map do |index|
+      create_user(login: format("test%02d", index), role: :employee, position: @position)
+    end
+    sign_in_as(@admin)
+
+    assert_difference -> { User.count }, -1 do
+      delete admin_user_path(users.last, page: 2), headers: { "Accept" => Mime[:turbo_stream].to_s }
+    end
+
+    assert_response :see_other
+    assert_redirected_to admin_users_path
   end
 
   private

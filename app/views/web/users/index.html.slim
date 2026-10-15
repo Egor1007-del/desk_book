@@ -33,3 +33,5 @@
               .d-flex.flex-nowrap.gap-1
                 - if policy(user).show?
                   = link_to t("actions.view"), user, class: "btn btn-sm btn-outline-primary"
+
+  = render "pagination", pagy: @pagy

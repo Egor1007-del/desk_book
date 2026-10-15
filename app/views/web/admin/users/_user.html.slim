@@ -8,12 +8,14 @@ tr id=dom_id(user)
   td = t("roles.#{user.role_name}")
   td.text-nowrap
     .d-flex.flex-nowrap.gap-1
-      = link_to t("actions.edit"), edit_admin_user_path(user),
+      = link_to t("actions.edit"),
+        edit_admin_user_path(user, page: current_page == 1 ? nil : current_page),
         class: "btn btn-sm btn-outline-primary",
         data: { turbo_frame: "admin_user_form" }
       - if policy([:admin, user]).destroy?
         - delete_data = { turbo: user == current_user ? false : nil,
           turbo_confirm: t("users.confirm_delete", name: user.full_name) }
-        = button_to t("actions.delete"), admin_user_path(user), method: :delete,
+        = button_to t("actions.delete"), admin_user_path(user, page: current_page == 1 ? nil : current_page),
+          method: :delete,
           class: "btn btn-sm btn-outline-danger",
           data: delete_data

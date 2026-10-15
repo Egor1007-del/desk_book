@@ -1,0 +1,4 @@
+- if pagy.last > 1
+  .mt-4.d-flex.justify-content-center
+    == pagy.series_nav(:bootstrap, classes: "pagination mb-0",
+      aria_label: t("pagination.navigation"))

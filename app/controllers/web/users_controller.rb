@@ -1,7 +1,7 @@
 module Web
   class UsersController < ApplicationController
     def index
-      @users = policy_scope(User).includes(:position).order(:last_name, :first_name)
+      users = policy_scope(User).includes(:position).order(:last_name, :first_name, :id)
       authorize User, request.format.xlsx? ? :export? : :index?
 
       respond_to do |format|
@@ -10,9 +10,11 @@ module Web
             redirect_to admin_users_path
           else
             @employees_count = Position.sum(:users_count)
+            @pagy, @users = pagy(:offset, users, limit: 10, count: @employees_count)
           end
         end
         format.xlsx do
+          @users = users
           response.headers["Content-Disposition"] = 'attachment; filename="employees.xlsx"'
         end
       end

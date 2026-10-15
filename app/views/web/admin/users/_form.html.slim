@@ -1,5 +1,6 @@
 = simple_form_for [:admin, user] do |form|
   = form.error_notification
+  = hidden_field_tag :page, params[:page] if turbo_frame_request? && params[:page].present?
 
   .row.g-3
     .col-12.col-md-6

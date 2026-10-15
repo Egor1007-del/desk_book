@@ -60,8 +60,13 @@ module Web
         respond_to do |format|
           format.html { redirect_to admin_users_path, notice: t("flash.users.deleted") }
           format.turbo_stream do
-            @employees_count = Position.sum(:users_count)
-            flash.now[:notice] = t("flash.users.deleted")
+            load_users
+            if @pagy.page > @pagy.last
+              page = @pagy.last unless @pagy.last == 1
+              redirect_to admin_users_path(page: page), status: :see_other, notice: t("flash.users.deleted")
+            else
+              flash.now[:notice] = t("flash.users.deleted")
+            end
           end
         end
       rescue ActiveRecord::RecordInvalid => error
@@ -75,8 +80,19 @@ module Web
       end
 
       def load_users
-        @users = policy_scope([ :admin, User ]).includes(:position, :roles).order(:last_name, :first_name)
         @employees_count = Position.sum(:users_count)
+        users = policy_scope([ :admin, User ]).includes(:position, :roles).order(:last_name, :first_name, :id)
+        pagination_request = {
+          path: admin_users_path,
+          params: request.query_parameters.slice("locale").merge("page" => params[:page]).compact
+        }
+        @pagy, @users = pagy(
+          :offset,
+          users,
+          limit: 10,
+          count: @employees_count,
+          request: pagination_request
+        )
       end
 
       def user_params
