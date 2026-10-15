@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "8.1.3.1"
+gem "rails", "8.1.4"
 # Provide Rails framework translations and pluralization rules for Russian.
 gem "rails-i18n", "~> 8.0"
 # Rails 8.1.3.1 passes JSON parser options as a positional hash.
