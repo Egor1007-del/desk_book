@@ -5,15 +5,20 @@
     div
       p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.admin")
       h1.h2.mb-1 = t("admin.users.index.title")
-      p.text-secondary.mb-0 = t("employees.count", count: @employees_count)
+      p#admin_users_count.text-secondary.mb-0
+        = render "count", employees_count: @employees_count
     .d-flex.flex-wrap.gap-2
       = link_to t("actions.download_excel"), users_path(format: :xlsx),
         class: "btn btn-success", data: { turbo: false }
       = link_to t("profiles.edit.title"), edit_profile_path, class: "btn btn-outline-primary"
       - if policy([:admin, :analytics]).show?
         = link_to t("admin.analytics.title"), admin_analytics_path, class: "btn btn-outline-primary"
-      = link_to t("admin.users.new.title"), new_admin_user_path, class: "btn btn-primary"
+      = link_to t("admin.users.new.title"), new_admin_user_path,
+        class: "btn btn-primary", data: { turbo_frame: "admin_user_form" }
 
+  = turbo_frame_tag "admin_user_form",
+    class: "admin-user-form-frame position-fixed top-0 end-0 overflow-auto",
+    data: { controller: "admin-user-form" }
   .table-responsive
     table.table.table-hover.table-striped.align-middle.mb-0
       thead.table-light
@@ -26,20 +31,5 @@
           th = User.human_attribute_name(:login)
           th = User.human_attribute_name(:role_name)
           th.text-nowrap = t("actions.title")
-      tbody
-        - @users.each do |user|
-          tr
-            td = link_to user.full_name, admin_user_path(user)
-            td = user.position.name
-            td.text-nowrap = l(user.hired_on, format: :short)
-            td = user.phone.presence || "—"
-            td = user.email.presence || "—"
-            td = user.login
-            td = t("roles.#{user.role_name}")
-            td.text-nowrap
-              .d-flex.flex-nowrap.gap-1
-                = link_to t("actions.edit"), edit_admin_user_path(user), class: "btn btn-sm btn-outline-primary"
-                - if policy([:admin, user]).destroy?
-                  = button_to t("actions.delete"), admin_user_path(user), method: :delete,
-                    class: "btn btn-sm btn-outline-danger",
-                    data: { turbo_confirm: t("users.confirm_delete", name: user.full_name) }
+      tbody#admin_users_table_body
+        = render "users", users: @users

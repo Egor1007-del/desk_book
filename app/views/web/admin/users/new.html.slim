@@ -1,8 +1,12 @@
 - content_for :title, t("admin.users.new.title")
 
 .container.py-5
-  .mb-4
-    p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.admin")
-    h1.h2.mb-1 = t("admin.users.new.title")
+  - if turbo_frame_request?
+    = turbo_frame_tag "admin_user_form" do
+      = render "form_panel", user: @user, title: t("admin.users.new.title")
+  - else
+    .mb-4
+      p.text-uppercase.text-secondary.small.fw-semibold.mb-2 = t("brand.admin")
+      h1.h2.mb-1 = t("admin.users.new.title")
 
-  = render "form", user: @user
+    = render "form", user: @user

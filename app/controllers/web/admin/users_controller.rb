@@ -4,9 +4,8 @@ module Web
       before_action :set_user, only: %i[show edit update destroy]
 
       def index
-        @users = policy_scope([ :admin, User ]).includes(:position, :roles).order(:last_name, :first_name)
         authorize [ :admin, User ]
-        @employees_count = Position.sum(:users_count)
+        load_users
       end
 
       def show
@@ -24,9 +23,15 @@ module Web
         @user.assign_attributes(user_params)
 
         @user.save_with_role!(role: submitted_role)
-        redirect_to admin_user_path(@user), notice: t("flash.users.created")
+        if turbo_frame_request?
+          load_users
+          flash.now[:notice] = t("flash.users.created")
+          render :create, formats: :turbo_stream
+        else
+          redirect_to admin_user_path(@user), notice: t("flash.users.created")
+        end
       rescue ActiveRecord::RecordInvalid
-        render :new, status: :unprocessable_entity
+        render :new, formats: :html, status: :unprocessable_entity
       end
 
       def edit
@@ -38,15 +43,27 @@ module Web
         authorize [ :admin, @user ], :change_role? if submitted_role != @user.role_name
 
         @user.save_with_role!(user_params, role: submitted_role)
-        redirect_to admin_user_path(@user), notice: t("flash.users.updated")
+        if turbo_frame_request?
+          load_users
+          flash.now[:notice] = t("flash.users.updated")
+          render :update, formats: :turbo_stream
+        else
+          redirect_to admin_user_path(@user), notice: t("flash.users.updated")
+        end
       rescue ActiveRecord::RecordInvalid
-        render :edit, status: :unprocessable_entity
+        render :edit, formats: :html, status: :unprocessable_entity
       end
 
       def destroy
         authorize [ :admin, @user ]
         @user.destroy_with_role_safety!
-        redirect_to admin_users_path, notice: t("flash.users.deleted")
+        respond_to do |format|
+          format.html { redirect_to admin_users_path, notice: t("flash.users.deleted") }
+          format.turbo_stream do
+            @employees_count = Position.sum(:users_count)
+            flash.now[:notice] = t("flash.users.deleted")
+          end
+        end
       rescue ActiveRecord::RecordInvalid => error
         redirect_to admin_user_path(error.record), alert: error.record.errors.full_messages.to_sentence
       end
@@ -55,6 +72,11 @@ module Web
 
       def set_user
         @user = User.includes(:position, :roles).find(params[:id])
+      end
+
+      def load_users
+        @users = policy_scope([ :admin, User ]).includes(:position, :roles).order(:last_name, :first_name)
+        @employees_count = Position.sum(:users_count)
       end
 
       def user_params

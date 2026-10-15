@@ -1,0 +1,4 @@
+= turbo_stream.update "admin_users_table_body", partial: "users", locals: { users: @users }
+= turbo_stream.update "admin_users_count", partial: "count", locals: { employees_count: @employees_count }
+= turbo_stream.update "admin_user_form", ""
+= turbo_stream.update "flash_messages", partial: "layouts/web/flash"

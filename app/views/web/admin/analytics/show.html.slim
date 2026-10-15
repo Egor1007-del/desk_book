@@ -12,24 +12,5 @@
     p.text-secondary = t("admin.analytics.no_positions")
 
   - @positions.each do |position|
-    section.card.mb-4 id=dom_id(position)
-      .card-header.d-flex.align-items-center.justify-content-between.gap-3
-        h2.h5.mb-0 = position.name
-        span.badge.text-bg-secondary
-          = t("admin.analytics.total", count: position.users_count)
-      .card-body
-        - employees = @recent_employees.fetch(position)
-        - if employees.empty?
-          p.text-secondary.mb-0 = t("admin.analytics.no_employees")
-        - else
-          .table-responsive
-            table.table.table-striped.align-middle.mb-0
-              thead
-                tr
-                  th = t("attributes.full_name")
-                  th = User.human_attribute_name(:hired_on)
-              tbody
-                - employees.each do |employee|
-                  tr
-                    td = link_to employee.full_name, admin_user_path(employee)
-                    td.text-nowrap = l(employee.hired_on, format: :short)
+    = render "position_card", position: position,
+      employees: @recent_employees.fetch(position)

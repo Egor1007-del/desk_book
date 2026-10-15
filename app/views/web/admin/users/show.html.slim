@@ -11,7 +11,7 @@
       - if policy([:admin, @user]).destroy?
         = button_to t("actions.delete"), admin_user_path(@user), method: :delete,
           class: "btn btn-outline-danger",
-          data: { turbo_confirm: t("users.confirm_delete", name: @user.full_name) }
+          data: { turbo: false, turbo_confirm: t("users.confirm_delete", name: @user.full_name) }
 
   .card.border-0.shadow-sm
     .card-body

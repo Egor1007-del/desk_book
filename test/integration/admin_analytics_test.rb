@@ -130,6 +130,29 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{admin_users_path}']", text: I18n.t("admin.users.index.title")
   end
 
+  test "cached position cards expire for locale and displayed data changes" do
+    sign_in_as(@admin)
+
+    with_fragment_cache do
+      get admin_analytics_path
+      assert_select "#position_#{@developer_position.id} a", text: @employee.full_name
+
+      @employee.update!(last_name: "Changed")
+      get admin_analytics_path
+      assert_select "#position_#{@developer_position.id} a", text: @employee.reload.full_name
+
+      create_user(login: "second", position: @developer_position)
+      get admin_analytics_path
+      assert_select "#position_#{@developer_position.id} .badge",
+        text: I18n.t("admin.analytics.total", count: 2)
+
+      get admin_analytics_path(locale: :en)
+      assert_select "html[lang='en']"
+      assert_select "#position_#{@developer_position.id} .badge",
+        text: I18n.t("admin.analytics.total", count: 2, locale: :en)
+    end
+  end
+
   private
 
   def create_user(login:, position:, role: :employee, hired_on: Date.new(2024, 1, 15))
@@ -145,5 +168,20 @@ class AdminAnalyticsTest < ActionDispatch::IntegrationTest
       user: { login: user.login, password: "secret123" }
     }
     follow_redirect!
+  end
+
+  def with_fragment_cache
+    original_cache = Rails.cache
+    original_controller_cache = ActionController::Base.cache_store
+    original_perform_caching = ActionController::Base.perform_caching
+    memory_store = ActiveSupport::Cache::MemoryStore.new
+    Rails.cache = memory_store
+    ActionController::Base.cache_store = memory_store
+    ActionController::Base.perform_caching = true
+    yield
+  ensure
+    Rails.cache = original_cache
+    ActionController::Base.cache_store = original_controller_cache
+    ActionController::Base.perform_caching = original_perform_caching
   end
 end

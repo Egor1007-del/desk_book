@@ -13,6 +13,34 @@
   letter-spacing: 0.08em;
 }
 
+.flash-messages {
+  z-index: $zindex-toast;
+  top: 4.5rem !important;
+  width: min(26rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.flash-messages .alert {
+  pointer-events: auto;
+}
+
+.admin-user-form-frame {
+  z-index: $zindex-modal;
+  top: 4.5rem !important;
+  width: min(46rem, 100vw);
+  max-height: calc(100vh - 4.5rem);
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.admin-user-form-frame:not(:empty) {
+  pointer-events: auto;
+}
+
+.admin-user-form-frame .card {
+  box-shadow: 0 1rem 3rem rgba($black, 0.25) !important;
+}
+
 .home-hero {
   position: relative;
   overflow: hidden;

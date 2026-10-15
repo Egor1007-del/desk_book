@@ -1,0 +1,19 @@
+tr id=dom_id(user)
+  td = link_to user.full_name, admin_user_path(user), data: { turbo_frame: "_top" }
+  td = user.position.name
+  td.text-nowrap = l(user.hired_on, format: :short)
+  td = user.phone.presence || "—"
+  td = user.email.presence || "—"
+  td = user.login
+  td = t("roles.#{user.role_name}")
+  td.text-nowrap
+    .d-flex.flex-nowrap.gap-1
+      = link_to t("actions.edit"), edit_admin_user_path(user),
+        class: "btn btn-sm btn-outline-primary",
+        data: { turbo_frame: "admin_user_form" }
+      - if policy([:admin, user]).destroy?
+        - delete_data = { turbo: user == current_user ? false : nil,
+          turbo_confirm: t("users.confirm_delete", name: user.full_name) }
+        = button_to t("actions.delete"), admin_user_path(user), method: :delete,
+          class: "btn btn-sm btn-outline-danger",
+          data: delete_data

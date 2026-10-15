@@ -1,0 +1,3 @@
+= turbo_stream.remove dom_id(@user)
+= turbo_stream.update "admin_users_count", partial: "count", locals: { employees_count: @employees_count }
+= turbo_stream.update "flash_messages", partial: "layouts/web/flash"

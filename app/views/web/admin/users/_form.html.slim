@@ -34,5 +34,9 @@
 
   .mt-4
     = form.button :submit, t("actions.save"), class: "btn btn-primary"
-    = link_to t("actions.cancel"), user.persisted? ? admin_user_path(user) : admin_users_path,
-      class: "btn btn-outline-secondary ms-2"
+    - if turbo_frame_request?
+      button.btn.btn-outline-secondary.ms-2[type="button" data-action="admin-user-form#close"]
+        = t("actions.cancel")
+    - else
+      = link_to t("actions.cancel"), user.persisted? ? admin_user_path(user) : admin_users_path,
+        class: "btn btn-outline-secondary ms-2"

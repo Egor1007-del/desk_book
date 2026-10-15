@@ -11,6 +11,10 @@ class AdminUserManagementTest < ApplicationSystemTestCase
     sign_in_through_ui(@admin)
     click_link I18n.t("admin.users.index.title")
     click_link I18n.t("admin.users.new.title")
+    assert_current_path admin_users_path
+    assert_equal "fixed", page.evaluate_script(
+      "getComputedStyle(document.querySelector('#admin_user_form')).position"
+    )
 
     fill_in "user_last_name", with: "New"
     fill_in "user_first_name", with: "Employee"
@@ -26,14 +30,21 @@ class AdminUserManagementTest < ApplicationSystemTestCase
     click_button I18n.t("actions.save")
 
     assert_text I18n.t("flash.users.created")
-    assert_selector "h1", text: "New Employee Test"
-    click_link I18n.t("actions.edit")
+    assert_selector "tr", text: "New Employee Test"
+    within "#flash_messages" do
+      find(".btn-close").click
+    end
+    assert_no_selector "#flash_messages .alert"
+
+    within("tr", text: "New Employee Test") do
+      click_link I18n.t("actions.edit")
+    end
+    assert_selector "turbo-frame#admin_user_form"
     fill_in "user_last_name", with: "Updated"
     click_button I18n.t("actions.save")
 
     assert_text I18n.t("flash.users.updated")
-    assert_selector "h1", text: "Updated Employee Test"
-    click_link I18n.t("actions.back_to_management")
+    assert_selector "tr", text: "Updated Employee Test"
 
     within("tr", text: "Updated Employee Test") do
       dismiss_confirm do
@@ -49,5 +60,37 @@ class AdminUserManagementTest < ApplicationSystemTestCase
     end
     assert_text I18n.t("flash.users.deleted")
     assert_no_selector "tr", text: "Updated Employee Test"
+  end
+
+  test "administrator saves a directly opened edit page" do
+    employee = create_user(login: "employee", role: :employee, position: @position)
+    sign_in_through_ui(@admin)
+
+    visit edit_admin_user_path(employee)
+    assert_no_selector "turbo-frame#admin_user_form"
+    fill_in "user_last_name", with: "Direct"
+    click_button I18n.t("actions.save")
+
+    assert_current_path admin_user_path(employee)
+    assert_selector "h1", text: "Direct User"
+    assert_text I18n.t("flash.users.updated")
+  end
+
+  test "administrator cancels editing without leaving the management page" do
+    employee = create_user(login: "employee", role: :employee, position: @position)
+    sign_in_through_ui(@admin)
+    click_link I18n.t("admin.users.index.title")
+
+    within("tr", text: employee.full_name) do
+      click_link I18n.t("actions.edit")
+    end
+    within "turbo-frame#admin_user_form" do
+      assert_selector "form[action='#{admin_user_path(employee)}']"
+      click_button I18n.t("actions.cancel")
+    end
+
+    assert_current_path admin_users_path
+    assert_no_selector "turbo-frame#admin_user_form form"
+    assert_selector "tr", text: employee.full_name
   end
 end

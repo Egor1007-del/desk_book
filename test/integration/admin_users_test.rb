@@ -23,6 +23,84 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_select "dd", text: @employee.login
   end
 
+  test "new and edit forms can render inside the management frame" do
+    sign_in_as(@admin)
+
+    get new_admin_user_path, headers: { "Turbo-Frame" => "admin_user_form" }
+    assert_response :success
+    assert_select "turbo-frame#admin_user_form" do
+      assert_select "form[action='#{admin_users_path}']"
+      assert_select "button[data-action='admin-user-form#close']", text: I18n.t("actions.cancel")
+    end
+
+    get edit_admin_user_path(@employee), headers: { "Turbo-Frame" => "admin_user_form" }
+    assert_response :success
+    assert_select "turbo-frame#admin_user_form form[action='#{admin_user_path(@employee)}']"
+  end
+
+  test "direct edit stays a full page and redirects after a Turbo submission" do
+    sign_in_as(@admin)
+
+    get edit_admin_user_path(@employee)
+    assert_response :success
+    assert_select "h1", text: I18n.t("admin.users.edit.title", name: @employee.full_name)
+    assert_select "turbo-frame#admin_user_form", count: 0
+    assert_select "a[href='#{admin_user_path(@employee)}']", text: I18n.t("actions.cancel")
+
+    patch admin_user_path(@employee), params: {
+      user: update_params(last_name: "Direct")
+    }, headers: { "Accept" => Mime[:turbo_stream].to_s }
+
+    assert_redirected_to admin_user_path(@employee)
+    assert_equal "Direct", @employee.reload.last_name
+  end
+
+  test "administrator creates an employee with a Turbo Stream response" do
+    sign_in_as(@admin)
+
+    assert_difference -> { User.count }, 1 do
+      post admin_users_path, params: { user: new_user_params }, headers: turbo_stream_headers
+    end
+
+    assert_response :success
+    assert_equal Mime[:turbo_stream].to_s, response.media_type
+    assert_turbo_stream_targets "admin_users_table_body", "admin_users_count",
+      "admin_user_form", "flash_messages"
+    assert_includes response.body, I18n.t("flash.users.created")
+  end
+
+  test "invalid Turbo Stream creation returns the frame with errors" do
+    sign_in_as(@admin)
+
+    assert_no_difference -> { User.count } do
+      post admin_users_path, params: { user: new_user_params.merge(last_name: "") },
+        headers: turbo_stream_headers
+    end
+
+    assert_response :unprocessable_entity
+    assert_equal "text/html", response.media_type
+    assert_select "turbo-frame#admin_user_form .invalid-feedback"
+  end
+
+  test "administrator updates and deletes an employee with Turbo Stream responses" do
+    sign_in_as(@admin)
+
+    patch admin_user_path(@employee), params: {
+      user: update_params(last_name: "Updated")
+    }, headers: turbo_stream_headers
+    assert_response :success
+    assert_turbo_stream_targets "admin_users_table_body", "admin_users_count",
+      "admin_user_form", "flash_messages"
+    assert_equal "Updated", @employee.reload.last_name
+
+    assert_difference -> { User.count }, -1 do
+      delete admin_user_path(@employee), headers: turbo_stream_headers
+    end
+    assert_response :success
+    assert_select "turbo-stream[action='remove'][target='user_#{@employee.id}']", count: 1
+    assert_turbo_stream_targets "admin_users_count", "flash_messages"
+  end
+
   test "employee cannot access administrative management" do
     sign_in_as(@employee)
 
@@ -233,5 +311,15 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
       user: { login: user.login, password: "secret123" }
     }
     follow_redirect!
+  end
+
+  def turbo_stream_headers
+    { "Accept" => Mime[:turbo_stream].to_s, "Turbo-Frame" => "admin_user_form" }
+  end
+
+  def assert_turbo_stream_targets(*targets)
+    targets.each do |target|
+      assert_select "turbo-stream[target='#{target}']", count: 1
+    end
   end
 end

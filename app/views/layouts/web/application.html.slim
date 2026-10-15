@@ -40,11 +40,7 @@ html lang=I18n.locale
               class: "btn btn-sm btn-dark"
           - else
             = link_to t("navigation.sign_in"), new_user_session_path, class: "btn btn-sm btn-dark"
-    - flash.each do |type, message|
-      - alert_class = type.to_s == "notice" ? "success" : "danger"
-      .container.pt-3
-        .alert.alert-dismissible.fade.show[class="alert-#{alert_class}" role="alert"]
-          = message
-          button.btn-close[type="button" data-bs-dismiss="alert" aria-label=t("actions.close")]
+    #flash_messages.flash-messages.position-fixed.top-0.end-0.p-3[aria-live="polite" aria-atomic="true"]
+      = render "layouts/web/flash"
     main
       = yield

@@ -95,6 +95,10 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "title", text: "Desk Book"
     assert_select "h1", text: I18n.t("home.title")
     assert_select "p", text: /Doe John/
+    assert_select "#flash_messages.flash-messages" do
+      assert_select ".alert[data-controller='flash']", text: I18n.t("devise.sessions.signed_in")
+      assert_select "button[data-bs-dismiss='alert']", count: 1
+    end
   end
 
   test "signed in layout has home and sign out controls" do
