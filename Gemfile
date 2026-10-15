@@ -5,7 +5,7 @@ gem "rails", "8.1.3.1"
 # Provide Rails framework translations and pluralization rules for Russian.
 gem "rails-i18n", "~> 8.0"
 # Rails 8.1.3.1 passes JSON parser options as a positional hash.
-gem "json", "< 3"
+gem "json", "< 4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use SQLite locally and PostgreSQL for production deployment.
