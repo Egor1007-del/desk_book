@@ -73,10 +73,6 @@ en:
     summary:
       title: "Current desk note"
       description: "Reliable directories are quiet infrastructure: they save a little time every day, then save a great deal when someone urgently needs the right person."
-    parable:
-      title: "The desk-book parable"
-      body: "A team once labelled every key but forgot to write down which door it opened. The labels were perfect; the work still stopped."
-      conclusion: "A useful directory connects information to a real person and a real responsibility."
     guide:
       purpose:
         question: "What does Desk Book solve?"

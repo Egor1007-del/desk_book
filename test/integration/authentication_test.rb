@@ -119,7 +119,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home page explains the directory and has interactive guidance" do
+  test "home page explains the directory without the parable and has interactive guidance" do
     post user_session_path, params: {
       user: { login: @user.login, password: "secret123" }
     }
@@ -127,6 +127,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_select ".home-summary", text: /#{I18n.t('employees.count', count: 1)}/
     assert_select "a[href='https://github.com/Egor1007-del/desk_book'][target='_blank']", text: I18n.t("home.github")
+    assert_select "blockquote", count: 0
     assert_select "#directory-guide button[data-bs-toggle='collapse']", count: 3
     assert_select "#directory-purpose.collapse.show", text: I18n.t("home.guide.purpose.answer")
   end

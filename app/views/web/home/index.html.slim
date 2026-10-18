@@ -24,52 +24,43 @@
           p.display-4.fw-bold.mb-3 = t("employees.count", count: @employees_count)
           p.text-secondary.mb-0 = t("home.summary.description")
 
-  .row.g-4
-    .col-lg-5
-      .card.border-0.shadow-sm.h-100
-        .card-body.p-4
-          p.home-kicker.mb-2 = t("home.parable.title")
-          blockquote.mb-0
-            p.fs-5.mb-3 = t("home.parable.body")
-            footer.text-secondary = t("home.parable.conclusion")
-    .col-lg-7
-      .accordion.shadow-sm#directory-guide
-        .accordion-item
-          h2.accordion-header
-            button.accordion-button(
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#directory-purpose"
-              aria-expanded="true"
-              aria-controls="directory-purpose"
-            )
-              = t("home.guide.purpose.question")
-          #directory-purpose.accordion-collapse.collapse.show[data-bs-parent="#directory-guide"]
-            .accordion-body
-              = t("home.guide.purpose.answer")
-        .accordion-item
-          h2.accordion-header
-            button.accordion-button.collapsed(
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#directory-access"
-              aria-expanded="false"
-              aria-controls="directory-access"
-            )
-              = t("home.guide.access.question")
-          #directory-access.accordion-collapse.collapse[data-bs-parent="#directory-guide"]
-            .accordion-body
-              = t("home.guide.access.answer")
-        .accordion-item
-          h2.accordion-header
-            button.accordion-button.collapsed(
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#directory-habit"
-              aria-expanded="false"
-              aria-controls="directory-habit"
-            )
-              = t("home.guide.habit.question")
-          #directory-habit.accordion-collapse.collapse[data-bs-parent="#directory-guide"]
-            .accordion-body
-              = t("home.guide.habit.answer")
+  .accordion.shadow-sm#directory-guide
+    .accordion-item
+      h2.accordion-header
+        button.accordion-button(
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#directory-purpose"
+          aria-expanded="true"
+          aria-controls="directory-purpose"
+        )
+          = t("home.guide.purpose.question")
+      #directory-purpose.accordion-collapse.collapse.show[data-bs-parent="#directory-guide"]
+        .accordion-body
+          = t("home.guide.purpose.answer")
+    .accordion-item
+      h2.accordion-header
+        button.accordion-button.collapsed(
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#directory-access"
+          aria-expanded="false"
+          aria-controls="directory-access"
+        )
+          = t("home.guide.access.question")
+      #directory-access.accordion-collapse.collapse[data-bs-parent="#directory-guide"]
+        .accordion-body
+          = t("home.guide.access.answer")
+    .accordion-item
+      h2.accordion-header
+        button.accordion-button.collapsed(
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#directory-habit"
+          aria-expanded="false"
+          aria-controls="directory-habit"
+        )
+          = t("home.guide.habit.question")
+      #directory-habit.accordion-collapse.collapse[data-bs-parent="#directory-guide"]
+        .accordion-body
+          = t("home.guide.habit.answer")
