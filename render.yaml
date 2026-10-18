@@ -16,6 +16,8 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      - key: EMPLOYEE_PASSWORD
+        sync: false
       - key: WEB_CONCURRENCY
         value: 1
       - key: RAILS_MAX_THREADS

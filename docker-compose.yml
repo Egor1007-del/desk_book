@@ -9,6 +9,7 @@ services:
       DATABASE_URL: postgresql://desk_book:${POSTGRES_PASSWORD:-desk_book}@db:5432/desk_book_production
       ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me}
+      EMPLOYEE_PASSWORD: ${EMPLOYEE_PASSWORD:-employee}
     depends_on:
       db:
         condition: service_healthy
