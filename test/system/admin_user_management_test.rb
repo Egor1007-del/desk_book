@@ -41,6 +41,13 @@ class AdminUserManagementTest < ApplicationSystemTestCase
 
     assert_text I18n.t("flash.users.created")
     assert_selector "tr", text: "New Employee Test"
+    flash_bottom, actions_top = page.evaluate_script(<<~JS)
+      [
+        document.querySelector('#flash_messages .alert').getBoundingClientRect().bottom,
+        document.querySelector("a[data-turbo-frame='admin_user_form']").getBoundingClientRect().top
+      ]
+    JS
+    assert_operator flash_bottom, :<=, actions_top
     within "#flash_messages" do
       find(".btn-close").click
     end

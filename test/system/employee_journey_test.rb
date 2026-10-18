@@ -13,7 +13,43 @@ class EmployeeJourneyTest < ApplicationSystemTestCase
     assert_equal "fixed", page.evaluate_script(
       "getComputedStyle(document.querySelector('#flash_messages')).position"
     )
-    assert_no_selector "#flash_messages .alert", wait: 6
+    alert_center, close_button_center = page.evaluate_script(<<~JS)
+      (() => {
+        const alertRect = document.querySelector('#flash_messages .alert').getBoundingClientRect()
+        const buttonRect = document.querySelector('#flash_messages .btn-close').getBoundingClientRect()
+        return [alertRect.top + alertRect.height / 2, buttonRect.top + buttonRect.height / 2]
+      })()
+    JS
+    assert_in_delta alert_center, close_button_center, 2
+    flash_bottom, content_top = page.evaluate_script(<<~JS)
+      [
+        document.querySelector('#flash_messages .alert').getBoundingClientRect().bottom,
+        document.querySelector('.home-hero').getBoundingClientRect().top
+      ]
+    JS
+    assert_operator flash_bottom, :<=, content_top
+    assert_no_selector "#flash_messages .alert", wait: 4
+
+    visit edit_profile_path
+    assert_selector "#user_phone"
+    page.execute_script(<<~JS)
+      const phone = document.querySelector('#user_phone')
+      phone.value = '89181234567'
+      phone.dispatchEvent(new Event('input', { bubbles: true }))
+      phone.dispatchEvent(new Event('change', { bubbles: true }))
+    JS
+    assert_equal "89181234567", find_field("user_phone").value
+    assert find("main form").evaluate_script("this.checkValidity()")
+    page.execute_script("document.querySelector('main form').requestSubmit()")
+    assert_selector "#flash_messages .alert"
+    flash_bottom, form_top = page.evaluate_script(<<~JS)
+      [
+        document.querySelector('#flash_messages .alert').getBoundingClientRect().bottom,
+        document.querySelector('main .card').getBoundingClientRect().top
+      ]
+    JS
+    assert_operator flash_bottom, :<=, form_top
+
     visit users_path
     assert_current_path users_path
     assert_selector "h1", text: I18n.t("users.index.title")
@@ -36,9 +72,10 @@ class EmployeeJourneyTest < ApplicationSystemTestCase
     visit users_path
 
     assert_selector "tbody tr", count: 10
-    within "nav[aria-label='#{I18n.t("pagination.navigation")}']" do
-      click_link "2"
+    second_page_url = within "nav[aria-label='#{I18n.t("pagination.navigation")}']" do
+      find_link("2")[:href]
     end
+    visit second_page_url
 
     assert_text "Test09 User"
     assert_selector "tbody tr", count: 1

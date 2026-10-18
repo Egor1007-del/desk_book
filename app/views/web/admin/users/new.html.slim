@@ -1,6 +1,6 @@
 - content_for :title, t("admin.users.new.title")
 
-.container.py-5
+.container.py-4
   - if turbo_frame_request?
     = turbo_frame_tag "admin_user_form" do
       = render "form_panel", user: @user, title: t("admin.users.new.title")

@@ -15,13 +15,24 @@
 
 .flash-messages {
   z-index: $zindex-toast;
-  top: 4.5rem !important;
-  width: min(26rem, calc(100vw - 2rem));
+  top: 2.25rem !important;
+  width: min(24rem, calc(100vw - 2rem));
+  padding-top: 0.625rem !important;
   pointer-events: none;
 }
 
 .flash-messages .alert {
+  --bs-alert-padding-x: 1rem;
+  --bs-alert-padding-y: 0.4375rem;
+
+  font-size: 0.875rem;
   pointer-events: auto;
+}
+
+.flash-messages .btn-close {
+  top: 50%;
+  padding: 0.5rem;
+  transform: translateY(-50%);
 }
 
 .admin-user-form-frame {
