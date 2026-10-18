@@ -12,9 +12,19 @@ class AdminUserManagementTest < ApplicationSystemTestCase
     click_link I18n.t("admin.users.index.title")
     click_link I18n.t("admin.users.new.title")
     assert_current_path admin_users_path
+    assert_selector ".admin-user-form-dialog"
     assert_equal "fixed", page.evaluate_script(
       "getComputedStyle(document.querySelector('#admin_user_form')).position"
     )
+    dialog_center = page.evaluate_script(<<~JS)
+      (() => {
+        const rect = document.querySelector('.admin-user-form-dialog').getBoundingClientRect()
+        return [rect.left + rect.width / 2, rect.top + rect.height / 2]
+      })()
+    JS
+    viewport_center = page.evaluate_script("[window.innerWidth / 2, window.innerHeight / 2]")
+    assert_in_delta viewport_center.first, dialog_center.first, 2
+    assert_in_delta viewport_center.last, dialog_center.last, 2
 
     fill_in "user_last_name", with: "New"
     fill_in "user_first_name", with: "Employee"

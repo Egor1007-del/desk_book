@@ -29,6 +29,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     get new_admin_user_path, headers: { "Turbo-Frame" => "admin_user_form" }
     assert_response :success
     assert_select "turbo-frame#admin_user_form" do
+      assert_select ".admin-user-form-dialog[role='dialog'][aria-modal='true']"
       assert_select "form[action='#{admin_users_path}']"
       assert_select "button[data-action='admin-user-form#close']", text: I18n.t("actions.cancel")
     end

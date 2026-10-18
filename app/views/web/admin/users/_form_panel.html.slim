@@ -1,4 +1,4 @@
-.card.border-0.shadow-sm.mb-4
+.card.admin-user-form-dialog.border-0.shadow-sm[role="dialog" aria-modal="true" aria-labelledby="admin-user-form-title"]
   .card-body
-    h2.h4.mb-4 = title
+    h2.h4.mb-4#admin-user-form-title = title
     = render "form", user: user
