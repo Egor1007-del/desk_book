@@ -33,7 +33,7 @@ gem "rolify"
 # Authorize server-side actions with explicit policies.
 gem "pundit"
 # Paginate employee registries with a small server-side helper.
-gem "pagy", "~> 43.7"
+gem "pagy", "~> 43.8"
 # Export the employee directory as an Office Open XML workbook.
 gem "caxlsx"
 gem "caxlsx_rails"
